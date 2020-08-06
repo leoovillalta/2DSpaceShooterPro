@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    
+    private float _initialSpeed = 5.0f;
+    private float _finalSpeed=5.0f;
     [SerializeField]
-    private float _speed=3.5f;
+    private float _speed=5.0f;
     [SerializeField]
     private float _speedMultiplierPowerUp = 2;
     [SerializeField]
@@ -28,16 +31,22 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     private GameObject _rightEngine, _leftEngine;
+    [SerializeField]
+    private float _increasedRate = 3f;
 
 
     [SerializeField]
     private int _score;
+
+    private ThrusterBehaviour _thruster;
+    private bool thrustersOn;
 
     private UIManager _uiManager;
 
     private bool _isTripleShotActive = false;
     //private bool _isSpeedBoostActive = false;
     private bool _isShieldBoostActive = false;
+
 
     private SpawnManager _spawnManager;
     // Start is called before the first frame update
@@ -48,7 +57,12 @@ public class Player : MonoBehaviour
         _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
         _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
         _audioSource = GetComponent<AudioSource>();
+        _thruster = GameObject.Find("Thruster").GetComponent<ThrusterBehaviour>();
 
+
+        //thrusters
+        _initialSpeed = _speed;
+        _finalSpeed = _speed;
         if(_spawnManager == null)
         {
             Debug.LogError("The SpawnManager is NULL!");
@@ -66,7 +80,33 @@ public class Player : MonoBehaviour
         }
     }
 
-
+    void ThrusterUp()
+    {
+        
+        
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            //Debug.Log("Entre aqui");
+            _uiManager.UITurnOnThrusters();
+            _finalSpeed = _speed * _increasedRate;
+            _thruster.IncreasedRateTrusters(true);
+            thrustersOn = true;
+        }
+        else if(Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            // Debug.Log("Sali de aqui");
+            _uiManager.UITurnOffThrusters();
+             _finalSpeed = _initialSpeed;
+            _thruster.IncreasedRateTrusters(false);
+            thrustersOn = false;
+        }
+       // Debug.Log("Paso por aqui");
+        _speed = _finalSpeed;
+        
+        
+           
+        
+    }
 
     // Update is called once per frame
     void Update()
@@ -76,6 +116,7 @@ public class Player : MonoBehaviour
         {
             FireLaser();
         }
+        ThrusterUp();
     }
 
     void FireLaser()

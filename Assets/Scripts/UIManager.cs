@@ -15,6 +15,8 @@ public class UIManager : MonoBehaviour
     private Text _gameOverText;
     [SerializeField]
     private Text _restartText;
+    [SerializeField]
+    private Text _FullPowerThrustersText;
 
     private GameManager _gameManager;
     // Start is called before the first frame update
@@ -66,4 +68,12 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void UITurnOnThrusters()
+    {
+        _FullPowerThrustersText.gameObject.SetActive(true);
+    }
+    public void UITurnOffThrusters()
+    {
+        _FullPowerThrustersText.gameObject.SetActive(false);
+    }
 }
