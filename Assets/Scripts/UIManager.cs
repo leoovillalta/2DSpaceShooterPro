@@ -18,6 +18,14 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Text _FullPowerThrustersText;
 
+    //Shields
+    [SerializeField]
+    private GameObject _shieldsUI;
+    [SerializeField]
+    private Image _shieldDamageBar;
+    [SerializeField]
+    private Text _shieldPercentage;
+
     private GameManager _gameManager;
     // Start is called before the first frame update
     void Start()
@@ -67,7 +75,7 @@ public class UIManager : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
         }
     }
-
+    //THRUSTERS
     public void UITurnOnThrusters()
     {
         _FullPowerThrustersText.gameObject.SetActive(true);
@@ -76,4 +84,12 @@ public class UIManager : MonoBehaviour
     {
         _FullPowerThrustersText.gameObject.SetActive(false);
     }
+    //SHIELDS
+    public void ShieldsManageUI(bool active, float shieldsPercentage)
+    {
+        _shieldsUI.gameObject.SetActive(active);
+        _shieldDamageBar.fillAmount = shieldsPercentage;
+        _shieldPercentage.text = (int)(shieldsPercentage * 100) + "%";
+    }
+    
 }

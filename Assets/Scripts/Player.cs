@@ -49,6 +49,10 @@ public class Player : MonoBehaviour
 
 
     private SpawnManager _spawnManager;
+
+    //SHIELDS
+    [SerializeField]
+    private int _shieldHits = 3;
     // Start is called before the first frame update
     void Start()
     {
@@ -167,6 +171,9 @@ public class Player : MonoBehaviour
     public void ShieldBoostActive()
     {
         _playerShield.SetActive(true);
+        _shieldHits = 3;
+        _uiManager.ShieldsManageUI(true, 1);
+        //Activate UI
         _isShieldBoostActive = true;
     }
 
@@ -212,9 +219,20 @@ public class Player : MonoBehaviour
     {
         if (_isShieldBoostActive == true)
         {
-            _playerShield.SetActive(false);
-            _isShieldBoostActive = false;
-            return;
+            _shieldHits--;
+            if (_shieldHits == 0)
+            {
+                _uiManager.ShieldsManageUI(false, 0);
+                _playerShield.SetActive(false);
+                _isShieldBoostActive = false;
+                return;
+            }
+            else
+            {
+                
+                _uiManager.ShieldsManageUI(true, _shieldHits / 3f);
+            }
+            
         }
         else
         {
