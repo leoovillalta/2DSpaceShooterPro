@@ -26,6 +26,18 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Text _shieldPercentage;
 
+    //AMMO
+    [SerializeField]
+    private Image _ammoBulletsImg;
+    [SerializeField]
+    private Image _ammoBarImg;
+    [SerializeField]
+    private Text _ammoText;
+    [SerializeField]
+    private GameObject _ammoBackground;
+    private Animator _ammoBGAnim;
+
+
     private GameManager _gameManager;
     // Start is called before the first frame update
     void Start()
@@ -33,6 +45,7 @@ public class UIManager : MonoBehaviour
         _ScoreText.text = "Score: " + 0;
         _gameOverText.gameObject.SetActive(false);
         _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        _ammoBGAnim = _ammoBackground.gameObject.GetComponent<Animator>();
         if(_gameManager == null)
         {
             Debug.LogError("GameManager is NULL");
@@ -90,6 +103,30 @@ public class UIManager : MonoBehaviour
         _shieldsUI.gameObject.SetActive(active);
         _shieldDamageBar.fillAmount = shieldsPercentage;
         _shieldPercentage.text = (int)(shieldsPercentage * 100) + "%";
+    }
+
+    //AMMO
+    public void UpdateAmmo(int bullets, bool OutOfAmmo)
+    {
+        if (OutOfAmmo)
+        {
+            _ammoBulletsImg.fillAmount = 0;
+            _ammoBarImg.fillAmount = 1;
+            _ammoBarImg.color = Color.red;
+            _ammoText.text = bullets.ToString();
+            _ammoBGAnim.SetBool("EmptyAmmo", true);
+        }
+        else
+        {
+            _ammoBGAnim.SetBool("EmptyAmmo", false);
+            float percentageAmmo = (float)bullets / 15f;
+            _ammoBulletsImg.fillAmount = (float)(0.041f * bullets) - 0.02f;
+            _ammoBarImg.fillAmount = percentageAmmo;
+            _ammoText.text = bullets.ToString();
+        }
+        //calculate IMG for number of bullets (0.041*bullets)-0.02
+        
+
     }
     
 }

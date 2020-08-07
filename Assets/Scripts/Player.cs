@@ -38,6 +38,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     private int _score;
 
+    //THRUSTERS
     private ThrusterBehaviour _thruster;
     private bool thrustersOn;
 
@@ -53,6 +54,13 @@ public class Player : MonoBehaviour
     //SHIELDS
     [SerializeField]
     private int _shieldHits = 3;
+
+    //AMMO
+    [SerializeField]
+    private int _maxAmmo = 15;
+    private bool OutOfAmmo = false;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -116,7 +124,7 @@ public class Player : MonoBehaviour
     void Update()
     {
         CalculateMovement();
-        if(Input.GetKeyDown(KeyCode.Space) && Time.time > _canFire)
+        if(Input.GetKeyDown(KeyCode.Space) && Time.time > _canFire && (!OutOfAmmo))
         {
             FireLaser();
         }
@@ -125,21 +133,49 @@ public class Player : MonoBehaviour
 
     void FireLaser()
     {
-        _canFire = Time.time + _fireRate;
-
-        if(_isTripleShotActive == true)
+        _maxAmmo--;
+        if (_maxAmmo == 0)
         {
-            Vector3 offsetLaserTripleShot = new Vector3(0, 1.05f, 0);
-            Instantiate(_tripleShotPrefab, transform.position + offsetLaserTripleShot, Quaternion.identity);
+            //ONE LAST SHOT
+
+            if (_isTripleShotActive == true)
+            {
+                Vector3 offsetLaserTripleShot = new Vector3(0, 1.05f, 0);
+                Instantiate(_tripleShotPrefab, transform.position + offsetLaserTripleShot, Quaternion.identity);
+            }
+            else
+            {
+                Vector3 offsetLaser = new Vector3(0, 1.05f, 0);
+                Instantiate(_laserPrefab, transform.position + offsetLaser, Quaternion.identity);
+            }
+
+            //Play Laser Audio Clip
+            _audioSource.Play();
+
+            //BLOCK AWAY LAST SHOT
+            OutOfAmmo = true;
+            _uiManager.UpdateAmmo(_maxAmmo, OutOfAmmo);
         }
         else
         {
-            Vector3 offsetLaser = new Vector3(0, 1.05f, 0);
-            Instantiate(_laserPrefab, transform.position + offsetLaser, Quaternion.identity);
-        }
+            _uiManager.UpdateAmmo(_maxAmmo, OutOfAmmo);
+            _canFire = Time.time + _fireRate;
 
-        //Play Laser Audio Clip
-        _audioSource.Play();
+            if (_isTripleShotActive == true)
+            {
+                Vector3 offsetLaserTripleShot = new Vector3(0, 1.05f, 0);
+                Instantiate(_tripleShotPrefab, transform.position + offsetLaserTripleShot, Quaternion.identity);
+            }
+            else
+            {
+                Vector3 offsetLaser = new Vector3(0, 1.05f, 0);
+                Instantiate(_laserPrefab, transform.position + offsetLaser, Quaternion.identity);
+            }
+
+            //Play Laser Audio Clip
+            _audioSource.Play();
+        }
+        
              
     }
 
