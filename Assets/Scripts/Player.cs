@@ -138,16 +138,7 @@ public class Player : MonoBehaviour
         {
             //ONE LAST SHOT
 
-            if (_isTripleShotActive == true)
-            {
-                Vector3 offsetLaserTripleShot = new Vector3(0, 1.05f, 0);
-                Instantiate(_tripleShotPrefab, transform.position + offsetLaserTripleShot, Quaternion.identity);
-            }
-            else
-            {
-                Vector3 offsetLaser = new Vector3(0, 1.05f, 0);
-                Instantiate(_laserPrefab, transform.position + offsetLaser, Quaternion.identity);
-            }
+            shot();
 
             //Play Laser Audio Clip
             _audioSource.Play();
@@ -161,22 +152,25 @@ public class Player : MonoBehaviour
             _uiManager.UpdateAmmo(_maxAmmo, OutOfAmmo);
             _canFire = Time.time + _fireRate;
 
-            if (_isTripleShotActive == true)
-            {
-                Vector3 offsetLaserTripleShot = new Vector3(0, 1.05f, 0);
-                Instantiate(_tripleShotPrefab, transform.position + offsetLaserTripleShot, Quaternion.identity);
-            }
-            else
-            {
-                Vector3 offsetLaser = new Vector3(0, 1.05f, 0);
-                Instantiate(_laserPrefab, transform.position + offsetLaser, Quaternion.identity);
-            }
-
+            shot();
             //Play Laser Audio Clip
             _audioSource.Play();
         }
         
              
+    }
+    void shot() {
+
+        if (_isTripleShotActive == true)
+        {
+            Vector3 offsetLaserTripleShot = new Vector3(0, 1.05f, 0);
+            Instantiate(_tripleShotPrefab, transform.position + offsetLaserTripleShot, Quaternion.identity);
+        }
+        else
+        {
+            Vector3 offsetLaser = new Vector3(0, 1.05f, 0);
+            Instantiate(_laserPrefab, transform.position + offsetLaser, Quaternion.identity);
+        }
     }
 
     public void TripleShotActive()
@@ -211,6 +205,14 @@ public class Player : MonoBehaviour
         _uiManager.ShieldsManageUI(true, 1);
         //Activate UI
         _isShieldBoostActive = true;
+    }
+
+    //AMMO POWERUP
+    public void RechargeAmmo()
+    {
+        OutOfAmmo = false;
+        _maxAmmo = 15;
+        _uiManager.UpdateAmmo(_maxAmmo, OutOfAmmo);
     }
 
     void CalculateMovement()
@@ -299,6 +301,11 @@ public class Player : MonoBehaviour
     public void AddScore(int points) {
         _score += points;
         _uiManager.UpdateScore(_score);
+        
     }
 
+
+   
+
+   
 }

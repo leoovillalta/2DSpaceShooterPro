@@ -123,6 +123,7 @@ public class UIManager : MonoBehaviour
             _ammoBulletsImg.fillAmount = (float)(0.041f * bullets) - 0.02f;
             _ammoBarImg.fillAmount = percentageAmmo;
             _ammoText.text = bullets.ToString();
+            _ammoBarImg.color = Color.white;
         }
         //calculate IMG for number of bullets (0.041*bullets)-0.02
         
