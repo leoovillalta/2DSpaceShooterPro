@@ -24,6 +24,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _playerShield;
 
+    private int _initialLives;
     [SerializeField]
     private AudioClip _laserSoundClip;
     private AudioSource _audioSource;
@@ -60,6 +61,9 @@ public class Player : MonoBehaviour
     private int _maxAmmo = 15;
     private bool OutOfAmmo = false;
 
+    //Lives
+    private bool _livesDecreased = true;
+
 
     // Start is called before the first frame update
     void Start()
@@ -75,6 +79,10 @@ public class Player : MonoBehaviour
         //thrusters
         _initialSpeed = _speed;
         _finalSpeed = _speed;
+
+        //LIVES
+        _initialLives = _lives;
+
         if(_spawnManager == null)
         {
             Debug.LogError("The SpawnManager is NULL!");
@@ -215,6 +223,22 @@ public class Player : MonoBehaviour
         _uiManager.UpdateAmmo(_maxAmmo, OutOfAmmo);
     }
 
+    //HEALTH PICKUP
+    public void HealPlayer()
+    {
+        if (_lives == _initialLives)
+        {
+            return;// Do nothing, lives are full
+        }
+        else
+        {
+            _lives++;
+            _livesDecreased = false;
+            livesStatus();
+
+        }
+    }
+
     void CalculateMovement()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
@@ -275,25 +299,57 @@ public class Player : MonoBehaviour
         else
         {
             _lives -= 1;
+            _livesDecreased = true;
+            livesStatus();
+            //if(_lives == 2)
+            //{
+            //    _leftEngine.SetActive(true);
+            //}
+            //else if (_lives == 1)
+            //{
+            //    _rightEngine.SetActive(true);
+            //}
 
-
-            if(_lives == 2)
-            {
-                _leftEngine.SetActive(true);
-            }
-            else if (_lives == 1)
-            {
-                _rightEngine.SetActive(true);
-            }
-
-            _uiManager.UpdateLives(_lives);
-            if (_lives < 1)
-            {
-                _spawnManager.OnPlayerDeath();
-                Destroy(this.gameObject);
-            }
+            //_uiManager.UpdateLives(_lives);
+            //if (_lives < 1)
+            //{
+            //    _spawnManager.OnPlayerDeath();
+            //    Destroy(this.gameObject);
+            //}
         }
         
+    }
+
+    //PLAYER UPDATE LIVES
+
+    void livesStatus()
+    {
+        _uiManager.UpdateLives(_lives);
+        switch (_lives)
+        {
+            case 0:
+                _spawnManager.OnPlayerDeath();
+                Destroy(this.gameObject);
+                break;
+            case 1:
+                _rightEngine.SetActive(true);
+                break;
+            case 2:
+                if (_livesDecreased)
+                {
+                    _leftEngine.SetActive(true);
+                }
+                else
+                {
+                    _rightEngine.SetActive(false);
+                }
+                
+                break;
+            case 3:
+                _leftEngine.SetActive(false);
+                _rightEngine.SetActive(false);
+                break;
+        }
     }
 
     //Method add 10 to Score

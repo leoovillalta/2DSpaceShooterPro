@@ -2129,6 +2129,7 @@ MonoBehaviour:
   - {fileID: 4919733219814430725, guid: 53eee990ccdc20e468bae63dec96072e, type: 3}
   - {fileID: 4309942276379790735, guid: a37f15d5f4d108a4cae15466aeee0f68, type: 3}
   - {fileID: 2561666061835780132, guid: 996cdbdf1493ce74b9cde69a76f0230d, type: 3}
+  - {fileID: 8170076347674816580, guid: 8b057e821a4b9ae49ac1d347c81b220f, type: 3}
   SpawnTimeEnemy: 5
   _enemyContainer: {fileID: 1162566458}
 --- !u!4 &1763653211
