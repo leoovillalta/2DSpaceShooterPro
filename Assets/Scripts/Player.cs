@@ -41,7 +41,7 @@ public class Player : MonoBehaviour
 
     //THRUSTERS
     private ThrusterBehaviour _thruster;
-    private bool thrustersOn;
+    private bool thrustersOn=false;
 
     private UIManager _uiManager;
 
@@ -70,6 +70,21 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _missilePrefab;
 
+
+    //Thrusters Power
+    private float _thrustersPower = 100.0f;
+    private float _maxThrustersPower = 100.0f;
+
+    private float _powerRegenTimer = 0.0f;
+
+    [SerializeField]
+    private float _powerDecreasedPerFrame = 5.0f;
+    [SerializeField]
+    private float _powerIncreasedPerFrame = 15.0f;
+    [SerializeField]
+    private float _powerTimeToRegen = 3.0f;
+
+    private bool _overheatedThrusters=false;
 
     // Start is called before the first frame update
     void Start()
@@ -110,28 +125,65 @@ public class Player : MonoBehaviour
     {
         
         
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        if (Input.GetKeyDown(KeyCode.LeftShift) && !_overheatedThrusters)
         {
             //Debug.Log("Entre aqui");
-            _uiManager.UITurnOnThrusters();
+            
+          //  _uiManager.UITurnOnThrusters();
             _finalSpeed = _speed * _increasedRate;
             _thruster.IncreasedRateTrusters(true);
             thrustersOn = true;
         }
-        else if(Input.GetKeyUp(KeyCode.LeftShift))
+        else if(Input.GetKeyUp(KeyCode.LeftShift) || _overheatedThrusters)
         {
             // Debug.Log("Sali de aqui");
-            _uiManager.UITurnOffThrusters();
+            //_uiManager.UITurnOffThrusters();
              _finalSpeed = _initialSpeed;
             _thruster.IncreasedRateTrusters(false);
             thrustersOn = false;
         }
        // Debug.Log("Paso por aqui");
         _speed = _finalSpeed;
-        
-        
-           
-        
+
+        powerConsumptionAndRegen();
+
+
+    }
+
+    void powerConsumptionAndRegen()
+    {
+        if (thrustersOn && !_overheatedThrusters)
+        {
+            _thrustersPower = Mathf.Clamp(_thrustersPower - (_powerDecreasedPerFrame * Time.deltaTime), 0.0f, _maxThrustersPower);
+           // _uiManager.ThrusterManagerUI(thrustersOn, _thrustersPower, _overheatedThrusters);
+            Debug.Log("Thruster Power: " + _thrustersPower);
+            _powerRegenTimer = 0.0f;
+            if (_thrustersPower == 0)
+            {
+                _overheatedThrusters = true;
+                _powerTimeToRegen = 5.0f;
+            }
+        }
+        else if (_thrustersPower < _maxThrustersPower)
+        {
+            if (_powerRegenTimer >= _powerTimeToRegen)
+            {
+                _thrustersPower = Mathf.Clamp(_thrustersPower + (_powerIncreasedPerFrame * Time.deltaTime), 0.0f, _maxThrustersPower);
+                if(_thrustersPower==100 && _overheatedThrusters)
+                {
+                    _overheatedThrusters = false;
+                    _powerTimeToRegen = 2.0f;
+                }
+            }
+            else
+            {
+                _powerRegenTimer += Time.deltaTime;
+            }
+            
+
+        }
+        Debug.Log("Overheated Thrusters: " + _overheatedThrusters);
+        _uiManager.ThrusterManagerUI(thrustersOn, _thrustersPower, _overheatedThrusters);
     }
 
     // Update is called once per frame

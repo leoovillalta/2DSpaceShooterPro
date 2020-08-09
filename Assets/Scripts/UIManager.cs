@@ -15,8 +15,7 @@ public class UIManager : MonoBehaviour
     private Text _gameOverText;
     [SerializeField]
     private Text _restartText;
-    [SerializeField]
-    private Text _FullPowerThrustersText;
+   
 
     //Shields
     [SerializeField]
@@ -37,6 +36,15 @@ public class UIManager : MonoBehaviour
     private GameObject _ammoBackground;
     private Animator _ammoBGAnim;
 
+    //Thrusters
+    [SerializeField]
+    private Text _FullPowerThrustersText;
+    [SerializeField]
+    private GameObject _thrustersBar;
+    [SerializeField]
+    private Slider _thrusterBarSlider;
+    private Animator _thrusterAnim;
+    private Animator _thrusterTextAnim;
 
     private GameManager _gameManager;
     // Start is called before the first frame update
@@ -46,6 +54,9 @@ public class UIManager : MonoBehaviour
         _gameOverText.gameObject.SetActive(false);
         _gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         _ammoBGAnim = _ammoBackground.gameObject.GetComponent<Animator>();
+        _thrusterAnim = _thrustersBar.gameObject.GetComponent<Animator>();
+        _thrusterTextAnim = _FullPowerThrustersText.gameObject.GetComponent<Animator>();
+        
         if(_gameManager == null)
         {
             Debug.LogError("GameManager is NULL");
@@ -89,14 +100,27 @@ public class UIManager : MonoBehaviour
         }
     }
     //THRUSTERS
-    public void UITurnOnThrusters()
+    public void ThrusterManagerUI(bool activated, float power, bool overheated)
     {
-        _FullPowerThrustersText.gameObject.SetActive(true);
+        _thrusterAnim.SetBool("overheated", overheated);
+        
+        if (overheated)
+        {
+            _thrusterTextAnim.SetBool("Overheated", true);
+            _FullPowerThrustersText.gameObject.SetActive(true);
+            _FullPowerThrustersText.text = "OVERHEATED!!!";
+        }
+        else
+        {
+            _FullPowerThrustersText.gameObject.SetActive(activated);
+            _FullPowerThrustersText.text = "FULL POWER\n THRUSTERS!";
+            _thrusterTextAnim.SetBool("Overheated", false);
+        }
+        //_thrustersBar.gameObject.GetComponent<Slider>().value = power / 100.0f;
+        _thrusterBarSlider.value = power / 100.0f;
+
     }
-    public void UITurnOffThrusters()
-    {
-        _FullPowerThrustersText.gameObject.SetActive(false);
-    }
+    
     //SHIELDS
     public void ShieldsManageUI(bool active, float shieldsPercentage)
     {
