@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PowerUp : MonoBehaviour
 {
-    enum PowerUpType {TripleShot, Speed, Shield, Ammo, Health };
+    enum PowerUpType {TripleShot, Speed, Shield, Ammo, Health, Missile };
     [SerializeField]
     private PowerUpType powerUpType = PowerUpType.TripleShot; 
     [SerializeField]
@@ -51,6 +51,9 @@ public class PowerUp : MonoBehaviour
                         break;
                     case PowerUpType.Health:
                         player.HealPlayer();
+                        break;
+                    case PowerUpType.Missile:
+                        player.MissileRoundsActive();
                         break;
                     default:
                         Debug.Log("Default Value");

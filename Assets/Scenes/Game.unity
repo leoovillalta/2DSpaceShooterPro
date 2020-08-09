@@ -1196,6 +1196,9 @@ MonoBehaviour:
   _score: 0
   _shieldHits: 3
   _maxAmmo: 15
+  _isMissileShotActive: 0
+  _missilePrefab: {fileID: 2432182329700955070, guid: 3bca57bd9cefd9a4692879b1fd2c003e,
+    type: 3}
 --- !u!212 &1102321989
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2130,6 +2133,7 @@ MonoBehaviour:
   - {fileID: 4309942276379790735, guid: a37f15d5f4d108a4cae15466aeee0f68, type: 3}
   - {fileID: 2561666061835780132, guid: 996cdbdf1493ce74b9cde69a76f0230d, type: 3}
   - {fileID: 8170076347674816580, guid: 8b057e821a4b9ae49ac1d347c81b220f, type: 3}
+  - {fileID: 7109547937558746400, guid: 0e941df3a3d378d4f86dc7d0700dfe7e, type: 3}
   SpawnTimeEnemy: 5
   _enemyContainer: {fileID: 1162566458}
 --- !u!4 &1763653211
@@ -2529,7 +2533,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 5b17a0088dcdf924fa92da5af1e1be07, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.45
+  m_Volume: 0.15
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -2655,7 +2659,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2112704895 stripped
 GameObject:
@@ -2771,7 +2775,7 @@ PrefabInstance:
     - target: {fileID: 5126185934920714963, guid: 21d9179353de1a14e899300299c94bf8,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.23
+      value: 4.4
       objectReference: {fileID: 0}
     - target: {fileID: 5126185934920714963, guid: 21d9179353de1a14e899300299c94bf8,
         type: 3}
@@ -2801,7 +2805,7 @@ PrefabInstance:
     - target: {fileID: 5126185934920714963, guid: 21d9179353de1a14e899300299c94bf8,
         type: 3}
       propertyPath: m_RootOrder
-      value: 8
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 5126185934920714963, guid: 21d9179353de1a14e899300299c94bf8,
         type: 3}

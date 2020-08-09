@@ -64,6 +64,12 @@ public class Player : MonoBehaviour
     //Lives
     private bool _livesDecreased = true;
 
+    //NEW SHOT TYPE
+    [SerializeField]
+    private bool _isMissileShotActive = false;
+    [SerializeField]
+    private GameObject _missilePrefab;
+
 
     // Start is called before the first frame update
     void Start()
@@ -168,8 +174,12 @@ public class Player : MonoBehaviour
              
     }
     void shot() {
-
-        if (_isTripleShotActive == true)
+        if(_isMissileShotActive == true)
+        {
+            Vector3 offsetMissileShot = new Vector3(0, 0.16f, 0);
+            Instantiate(_missilePrefab, transform.position + offsetMissileShot, Quaternion.identity);
+        }
+        else if (_isTripleShotActive == true)
         {
             Vector3 offsetLaserTripleShot = new Vector3(0, 1.05f, 0);
             Instantiate(_tripleShotPrefab, transform.position + offsetLaserTripleShot, Quaternion.identity);
@@ -179,6 +189,18 @@ public class Player : MonoBehaviour
             Vector3 offsetLaser = new Vector3(0, 1.05f, 0);
             Instantiate(_laserPrefab, transform.position + offsetLaser, Quaternion.identity);
         }
+    }
+
+    public void MissileRoundsActive()
+    {
+        _isMissileShotActive = true;
+        StartCoroutine(MissilePowerDownRoutine());
+    }
+
+    IEnumerator MissilePowerDownRoutine()
+    {
+        yield return new WaitForSeconds(5.0f);
+        _isMissileShotActive = false;
     }
 
     public void TripleShotActive()

@@ -84,7 +84,7 @@ public class Enemy : MonoBehaviour
             
         }
 
-        if (other.tag == "Laser") {
+        if (other.tag == "Laser" || other.tag == "Missile") {
 
             Destroy(other.gameObject);
             if(_player != null)
@@ -96,9 +96,16 @@ public class Enemy : MonoBehaviour
             _speed = 0;
             _audioSource.Play();
             Destroy(GetComponent<Collider2D>());
+            transform.GetChild(0).gameObject.SetActive(false);
             Destroy(this.gameObject,2.6f);
         }
+        
 
+
+    }
+    public void LockedOn()
+    {
+        transform.GetChild(0).gameObject.SetActive(true);
     }
 
 }

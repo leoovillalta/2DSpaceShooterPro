@@ -44,7 +44,19 @@ public class SpawnManager : MonoBehaviour
         while (_stopSpawning == false)
         {
             Vector3 postToSpawn = new Vector3(Random.Range(-8f, 8f), 7, 0);
-            int randomPowerUp = Random.Range(0, _PowerUpPrefabs.Length); //Changed to match PowerUpPrefabs added to the list
+
+            int randomPowerUp;
+            if(Random.value <= 0.4)
+            {
+                //40% chance to Spawn the last prefab
+                randomPowerUp = Random.Range(0, _PowerUpPrefabs.Length); //Changed to match PowerUpPrefabs added to the list
+            }
+            else
+            {
+                //Do not Spawn Last PowerUp MissileShot
+                randomPowerUp = Random.Range(0, _PowerUpPrefabs.Length-1); //Changed to match PowerUpPrefabs added to the list
+            }
+
             Instantiate(_PowerUpPrefabs[randomPowerUp], postToSpawn, Quaternion.identity);
             yield return new WaitForSeconds(Random.Range(3, 8));
         }
