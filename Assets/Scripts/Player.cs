@@ -86,6 +86,9 @@ public class Player : MonoBehaviour
 
     private bool _overheatedThrusters=false;
 
+    //CAMERA SHAKE
+    private CameraShake _cameraShake;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -95,7 +98,7 @@ public class Player : MonoBehaviour
         _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
         _audioSource = GetComponent<AudioSource>();
         _thruster = GameObject.Find("Thruster").GetComponent<ThrusterBehaviour>();
-
+        _cameraShake = GameObject.Find("Main Camera").GetComponent<CameraShake>();
 
         //thrusters
         _initialSpeed = _speed;
@@ -156,7 +159,7 @@ public class Player : MonoBehaviour
         {
             _thrustersPower = Mathf.Clamp(_thrustersPower - (_powerDecreasedPerFrame * Time.deltaTime), 0.0f, _maxThrustersPower);
            // _uiManager.ThrusterManagerUI(thrustersOn, _thrustersPower, _overheatedThrusters);
-            Debug.Log("Thruster Power: " + _thrustersPower);
+            //Debug.Log("Thruster Power: " + _thrustersPower);
             _powerRegenTimer = 0.0f;
             if (_thrustersPower == 0)
             {
@@ -182,7 +185,7 @@ public class Player : MonoBehaviour
             
 
         }
-        Debug.Log("Overheated Thrusters: " + _overheatedThrusters);
+        //Debug.Log("Overheated Thrusters: " + _overheatedThrusters);
         _uiManager.ThrusterManagerUI(thrustersOn, _thrustersPower, _overheatedThrusters);
     }
 
@@ -353,6 +356,7 @@ public class Player : MonoBehaviour
 
     public void Damage()
     {
+        _cameraShake.ShakeCameraNormalHit();
         if (_isShieldBoostActive == true)
         {
             _shieldHits--;
