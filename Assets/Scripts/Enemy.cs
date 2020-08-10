@@ -5,6 +5,7 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     enum EnemyType {Normal, Excalibur };
+    enum EnemyAttack { Laser, Mine, Ram};
     enum EnemyMovement {linear, circle, zigzag };
     [SerializeField]
     private float _speed = 4.0f;
@@ -24,6 +25,8 @@ public class Enemy : MonoBehaviour
     private EnemyType _enemyType = EnemyType.Normal;
     [SerializeField]
     private EnemyMovement _enemyMovement = EnemyMovement.linear;
+    [SerializeField]
+    private EnemyAttack _enemyAttack = EnemyAttack.Laser;
 
     //MOVEMENTS
     private Vector3 _pos;
@@ -32,8 +35,13 @@ public class Enemy : MonoBehaviour
     private float _frequency = 10.0f; // Speed of sine movement
     [SerializeField]
     private float _magnitude = 1.0f; //  Size of sine movement, its the amplitude of the side curve
-    
 
+    //MINE ATTACK
+    [SerializeField]
+    private GameObject _minePrefab;
+    [SerializeField]
+    private float _deployRate = 2.5f;
+    private float _canDeploy = -1f;
 
     // Start is called before the first frame update
     void Start()
@@ -52,18 +60,49 @@ public class Enemy : MonoBehaviour
 
         //ZIGZAG INITIALIZATION
         _pos = transform.position;
-        _axis = transform.right;
+        //_axis = transform.right; //Takes in consideration the rotation of an object
+        _axis = Vector3.right;
+        //Debug.Log("Transform.Right: " + _axis);
     }
 
     // Update is called once per frame
     void Update()
     {
         CalculateMovement();
-        if(Time.time> _canFire)
+        EnemyAttackType();
+    }
+    void LaserAttack()
+    {
+        if (Time.time > _canFire)
         {
             _fireRate = Random.Range(3f, 7f);
             _canFire = Time.time + _fireRate;
             Instantiate(_laserPrefab, transform.position, Quaternion.identity);
+        }
+    }
+    void MineDeploy()
+    {
+        if (Time.time > _canDeploy)
+        {
+            _deployRate = Random.Range(3f, 7f);
+            _canDeploy = Time.time + _deployRate;
+            Instantiate(_minePrefab, transform.position, Quaternion.identity);
+        }
+
+    }
+
+    void EnemyAttackType()
+    {
+        switch (_enemyAttack)
+        {
+            case EnemyAttack.Laser:
+                LaserAttack();
+                break;
+            case EnemyAttack.Mine:
+                MineDeploy();
+                break;
+            case EnemyAttack.Ram:
+                break;
         }
     }
 
@@ -101,7 +140,8 @@ public class Enemy : MonoBehaviour
             float randomX = Random.Range(-8.0f, 8.0f);
             transform.position = new Vector3(randomX, 7, 0);
             _pos = transform.position;
-            _axis = transform.right;
+            //_axis = transform.right;
+            _axis = Vector3.right; 
         }
     }
     //FAILED ERRATIC MOVEMENT

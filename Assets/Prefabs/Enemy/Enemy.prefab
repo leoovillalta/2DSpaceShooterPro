@@ -231,6 +231,14 @@ MonoBehaviour:
   _laserPrefab: {fileID: 5471559746161180762, guid: 87a444077d6a2424aa369aa8f6a109a1,
     type: 3}
   _fireRate: 3
+  _enemyType: 0
+  _enemyMovement: 0
+  _enemyAttack: 0
+  _frequency: 10
+  _magnitude: 1
+  _minePrefab: {fileID: 5451866625302438816, guid: 0408c2062fe4ecb43882e6f3fa1519d5,
+    type: 3}
+  _deployRate: 2.5
 --- !u!50 &9081571099156558526
 Rigidbody2D:
   serializedVersion: 4
