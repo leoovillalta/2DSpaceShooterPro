@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    enum EnemyType {Normal, Excalibur };
+    enum EnemyMovement {linear, circle, zigzag };
     [SerializeField]
     private float _speed = 4.0f;
     private Player _player;
@@ -16,6 +18,22 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     private float _fireRate = 3.0f;
     private float _canFire = -1f;
+
+    //Enemy types and movement
+    [SerializeField]
+    private EnemyType _enemyType = EnemyType.Normal;
+    [SerializeField]
+    private EnemyMovement _enemyMovement = EnemyMovement.linear;
+
+    //MOVEMENTS
+    private Vector3 _pos;
+    private Vector3 _axis;
+    [SerializeField]
+    private float _frequency = 10.0f; // Speed of sine movement
+    [SerializeField]
+    private float _magnitude = 1.0f; //  Size of sine movement, its the amplitude of the side curve
+    
+
 
     // Start is called before the first frame update
     void Start()
@@ -31,6 +49,10 @@ public class Enemy : MonoBehaviour
         {
             Debug.LogError("The Animator is null");
         }
+
+        //ZIGZAG INITIALIZATION
+        _pos = transform.position;
+        _axis = transform.right;
     }
 
     // Update is called once per frame
@@ -45,7 +67,23 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    void CalculateMovement() {
+    void CalculateMovement()
+    {
+        switch (_enemyMovement)
+        {
+            case EnemyMovement.linear:
+                linearMovement();
+                break;
+            case EnemyMovement.circle:
+                //circular movement method
+                break;
+            case EnemyMovement.zigzag:
+                zigzagMovement2();
+                break;
+        }
+    }
+    void linearMovement()
+    {
         transform.Translate(Vector3.down * _speed * Time.deltaTime);
         if (transform.position.y < -5f)
         {
@@ -54,6 +92,42 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    void zigzagMovement2()
+    {
+        _pos += Vector3.down * Time.deltaTime * _speed;
+        transform.position = _pos + _axis * Mathf.Sin(Time.time * _frequency) * _magnitude; // y = A sin(B(x)) , here A is Amplitude, and axis * magnitude is acting as amplitude. Amplitude means the depth of the sin curve
+        if (transform.position.y < -5f)
+        {
+            float randomX = Random.Range(-8.0f, 8.0f);
+            transform.position = new Vector3(randomX, 7, 0);
+            _pos = transform.position;
+            _axis = transform.right;
+        }
+    }
+    //FAILED ERRATIC MOVEMENT
+    void zigzagMovement()
+    {
+        Vector3 zigzagPos;
+        float XPingPong=0;
+        if(transform.position.x <= 1)
+        {
+            XPingPong = Mathf.PingPong(Time.time, 1);
+        }
+        else if(transform.position.x >= 1)
+        {
+            XPingPong = -Mathf.PingPong(Time.time, 1);
+        }
+        
+        Debug.Log("XPingPong: " + XPingPong);
+        zigzagPos = new Vector3(XPingPong, -1, 0);
+        transform.Translate(zigzagPos * _speed * Time.deltaTime);
+        if (transform.position.y < -5f)
+        {
+            float randomX = Random.Range(-8.0f, 8.0f);
+            transform.position = new Vector3(randomX, 7, 0);
+        }
+    }
+    //
     private void OnTriggerEnter2D(Collider2D other)
     {
         // Este debug esta super util para saber con que objeto esta colisionando
