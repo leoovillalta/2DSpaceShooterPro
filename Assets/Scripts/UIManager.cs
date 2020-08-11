@@ -45,6 +45,7 @@ public class UIManager : MonoBehaviour
     private Slider _thrusterBarSlider;
     private Animator _thrusterAnim;
     private Animator _thrusterTextAnim;
+    private bool _cooledDown=false;
 
 
     //WAVE
@@ -116,21 +117,34 @@ public class UIManager : MonoBehaviour
         }
     }
     //THRUSTERS
-    public void ThrusterManagerUI(bool activated, float power, bool overheated)
+    public void ThrusterManagerUI(bool activated, float power, bool overheated, bool blocked)
     {
-        _thrusterAnim.SetBool("overheated", overheated);
+        _thrusterAnim.SetBool("overheated", overheated || blocked);
         
         if (overheated)
         {
             _thrusterTextAnim.SetBool("Overheated", true);
             _FullPowerThrustersText.gameObject.SetActive(true);
             _FullPowerThrustersText.text = "OVERHEATED!!!";
+            _cooledDown = true;
         }
-        else
+        else if (blocked)
+        {
+            _thrusterTextAnim.SetBool("Overheated", true);
+            _FullPowerThrustersText.gameObject.SetActive(true);
+            _FullPowerThrustersText.text = "BLOCKED THRUSTERS!!!!";
+            _cooledDown = true;
+        }
+        else if (!overheated && !blocked)
         {
             _FullPowerThrustersText.gameObject.SetActive(activated);
             _FullPowerThrustersText.text = "FULL POWER\n THRUSTERS!";
-            _thrusterTextAnim.SetBool("Overheated", false);
+            if (_cooledDown)
+            {
+                _thrusterTextAnim.SetBool("Overheated", false);
+                _cooledDown = false;
+            }
+                
         }
         //_thrustersBar.gameObject.GetComponent<Slider>().value = power / 100.0f;
         _thrusterBarSlider.value = power / 100.0f;

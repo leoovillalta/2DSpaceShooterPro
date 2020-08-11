@@ -2897,6 +2897,7 @@ MonoBehaviour:
   - {fileID: 4309942276379790735, guid: a37f15d5f4d108a4cae15466aeee0f68, type: 3}
   - {fileID: 2561666061835780132, guid: 996cdbdf1493ce74b9cde69a76f0230d, type: 3}
   - {fileID: 8170076347674816580, guid: 8b057e821a4b9ae49ac1d347c81b220f, type: 3}
+  - {fileID: 6108882314280332008, guid: d6206d25f13a5bf479583d2de03ec644, type: 3}
   - {fileID: 7109547937558746400, guid: 0e941df3a3d378d4f86dc7d0700dfe7e, type: 3}
   SpawnTimeEnemy: 5
   _enemyContainer: {fileID: 1162566458}
@@ -2918,9 +2919,14 @@ MonoBehaviour:
     IsThereABoss: 0
   - WaveNumber: 4
     Title: FINAL WAVE
-    AmountOfEnemiesToBeSpawned: 20
+    AmountOfEnemiesToBeSpawned: 15
     Difficulty: 4
     IsThereABoss: 1
+  - WaveNumber: 5
+    Title: QUINTA OLEADA
+    AmountOfEnemiesToBeSpawned: 20
+    Difficulty: 4
+    IsThereABoss: 0
 --- !u!4 &1763653211
 Transform:
   m_ObjectHideFlags: 0
@@ -3330,7 +3336,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 5b17a0088dcdf924fa92da5af1e1be07, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.15
+  m_Volume: 0.025
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -3720,3 +3726,72 @@ PrefabInstance:
         type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 21d9179353de1a14e899300299c94bf8, type: 3}
+--- !u!1001 &6108882314447520206
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 6108882314280332002, guid: d6206d25f13a5bf479583d2de03ec644,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 3.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 6108882314280332002, guid: d6206d25f13a5bf479583d2de03ec644,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6108882314280332002, guid: d6206d25f13a5bf479583d2de03ec644,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6108882314280332002, guid: d6206d25f13a5bf479583d2de03ec644,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6108882314280332002, guid: d6206d25f13a5bf479583d2de03ec644,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6108882314280332002, guid: d6206d25f13a5bf479583d2de03ec644,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6108882314280332002, guid: d6206d25f13a5bf479583d2de03ec644,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6108882314280332002, guid: d6206d25f13a5bf479583d2de03ec644,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 13
+      objectReference: {fileID: 0}
+    - target: {fileID: 6108882314280332002, guid: d6206d25f13a5bf479583d2de03ec644,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6108882314280332002, guid: d6206d25f13a5bf479583d2de03ec644,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6108882314280332002, guid: d6206d25f13a5bf479583d2de03ec644,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6108882314280332008, guid: d6206d25f13a5bf479583d2de03ec644,
+        type: 3}
+      propertyPath: m_Name
+      value: ThrusterBlockNegativePowerUp
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d6206d25f13a5bf479583d2de03ec644, type: 3}

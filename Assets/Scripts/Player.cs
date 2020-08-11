@@ -86,6 +86,9 @@ public class Player : MonoBehaviour
 
     private bool _overheatedThrusters=false;
 
+    //Thrusters Block
+    private bool _thrustersBlocked = false;
+
     //CAMERA SHAKE
     private CameraShake _cameraShake;
 
@@ -128,7 +131,7 @@ public class Player : MonoBehaviour
     {
         
         
-        if (Input.GetKeyDown(KeyCode.LeftShift) && !_overheatedThrusters)
+        if (Input.GetKeyDown(KeyCode.LeftShift) && !_overheatedThrusters && !_thrustersBlocked)
         {
             //Debug.Log("Entre aqui");
             
@@ -155,7 +158,7 @@ public class Player : MonoBehaviour
 
     void powerConsumptionAndRegen()
     {
-        if (thrustersOn && !_overheatedThrusters)
+        if (thrustersOn && !_overheatedThrusters )
         {
             _thrustersPower = Mathf.Clamp(_thrustersPower - (_powerDecreasedPerFrame * Time.deltaTime), 0.0f, _maxThrustersPower);
            // _uiManager.ThrusterManagerUI(thrustersOn, _thrustersPower, _overheatedThrusters);
@@ -186,7 +189,7 @@ public class Player : MonoBehaviour
 
         }
         //Debug.Log("Overheated Thrusters: " + _overheatedThrusters);
-        _uiManager.ThrusterManagerUI(thrustersOn, _thrustersPower, _overheatedThrusters);
+        _uiManager.ThrusterManagerUI(thrustersOn, _thrustersPower, _overheatedThrusters,_thrustersBlocked);
     }
 
     // Update is called once per frame
@@ -314,6 +317,17 @@ public class Player : MonoBehaviour
             livesStatus();
 
         }
+    }
+    //Thruster Block
+    public void ThrusterBlock()
+    {
+        _thrustersBlocked = true;
+        StartCoroutine(ThrustersBlockedCountDown());
+    }
+    IEnumerator ThrustersBlockedCountDown()
+    {
+        yield return new WaitForSeconds(5.0f);
+        _thrustersBlocked = false;
     }
 
     void CalculateMovement()
