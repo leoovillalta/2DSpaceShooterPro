@@ -407,7 +407,7 @@ public class Player : MonoBehaviour
         {
             case 0:
                 _spawnManager.OnPlayerDeath();
-                Destroy(this.gameObject);
+                Destroy(this.gameObject,0.1f);
                 break;
             case 1:
                 _rightEngine.SetActive(true);

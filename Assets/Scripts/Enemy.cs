@@ -42,10 +42,13 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     private float _deployRate = 2.5f;
     private float _canDeploy = -1f;
-
+    //Contact SpawnManager
+    SpawnManager _spawnManager;
     // Start is called before the first frame update
     void Start()
     {
+
+        _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
         _player = GameObject.Find("Player").GetComponent<Player>();
         _audioSource = GetComponent<AudioSource>();
         if(_player == null)
@@ -194,6 +197,8 @@ public class Enemy : MonoBehaviour
             _anim.SetTrigger("OnEnemyDeath");
             _speed = 0; //para detener el objeto
             _audioSource.Play();
+            Destroy(GetComponent<Collider2D>());
+            _spawnManager.EnemyDestroyedReport();
             Destroy(this.gameObject,2.6f);
             
         }
@@ -211,6 +216,7 @@ public class Enemy : MonoBehaviour
             _audioSource.Play();
             Destroy(GetComponent<Collider2D>());
             transform.GetChild(0).gameObject.SetActive(false);
+            _spawnManager.EnemyDestroyedReport();
             Destroy(this.gameObject,2.6f);
         }
         

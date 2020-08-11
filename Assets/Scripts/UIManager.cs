@@ -46,6 +46,21 @@ public class UIManager : MonoBehaviour
     private Animator _thrusterAnim;
     private Animator _thrusterTextAnim;
 
+
+    //WAVE
+    [SerializeField]
+    private Text _waveCounter;
+    [SerializeField]
+    private Text _waveTitle;
+    [SerializeField]
+    private GameObject _waveObject;
+    private Animator _waveAnim;
+    [SerializeField]
+    private Text _totalEnemiesInWave;
+
+    [SerializeField]
+    private Text _enemiesLeftCounter;
+
     private GameManager _gameManager;
     // Start is called before the first frame update
     void Start()
@@ -56,6 +71,7 @@ public class UIManager : MonoBehaviour
         _ammoBGAnim = _ammoBackground.gameObject.GetComponent<Animator>();
         _thrusterAnim = _thrustersBar.gameObject.GetComponent<Animator>();
         _thrusterTextAnim = _FullPowerThrustersText.gameObject.GetComponent<Animator>();
+        _waveAnim = _waveObject.gameObject.GetComponent<Animator>();
         
         if(_gameManager == null)
         {
@@ -153,5 +169,28 @@ public class UIManager : MonoBehaviour
         
 
     }
+
+    //WAVE TITLE
+    public void ActivateAndAnnounceWave(string title, int wave, int TotalEnemies)
+    {
+        _waveObject.gameObject.SetActive(true);
+        _waveTitle.text = title;
+        _totalEnemiesInWave.text = "Total Enemies: " + TotalEnemies;
+        _waveCounter.text = "Wave: " + wave;
+        _waveAnim.SetTrigger("Announce");
+        StartCoroutine(WaveAnnounce());
+
+    }
+    IEnumerator WaveAnnounce()
+    {
+       
+        yield return new WaitForSeconds(3.0f);
+        _waveObject.gameObject.SetActive(false);
+    }
     
+    //Enemies Update
+    public void EnemiesLeftUpdate(int EnemiesLeft)
+    {
+        _enemiesLeftCounter.text = "Enemies Left: " + EnemiesLeft;
+    }
 }
