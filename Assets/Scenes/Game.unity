@@ -2905,28 +2905,62 @@ MonoBehaviour:
   - WaveNumber: 1
     Title: FIRST WAVE
     AmountOfEnemiesToBeSpawned: 5
-    Difficulty: 1
+    DifficultyLevel: 0
     IsThereABoss: 0
   - WaveNumber: 2
     Title: SECOND WAVE
     AmountOfEnemiesToBeSpawned: 12
-    Difficulty: 2
+    DifficultyLevel: 1
     IsThereABoss: 0
   - WaveNumber: 3
     Title: THIRD WAVE
     AmountOfEnemiesToBeSpawned: 14
-    Difficulty: 3
+    DifficultyLevel: 0
     IsThereABoss: 0
   - WaveNumber: 4
     Title: FINAL WAVE
     AmountOfEnemiesToBeSpawned: 15
-    Difficulty: 4
+    DifficultyLevel: 0
     IsThereABoss: 1
   - WaveNumber: 5
     Title: QUINTA OLEADA
     AmountOfEnemiesToBeSpawned: 20
-    Difficulty: 4
+    DifficultyLevel: 0
     IsThereABoss: 0
+  _difficultyFactor: 1
+  _waveDifficulty: 0
+  _powerUpsProb:
+  - PowerUp: {fileID: 8170076347674816580, guid: 8b057e821a4b9ae49ac1d347c81b220f,
+      type: 3}
+    SpawnProbability: 0.1
+    _statusEffect: 0
+  - PowerUp: {fileID: 2561666061835780132, guid: 996cdbdf1493ce74b9cde69a76f0230d,
+      type: 3}
+    SpawnProbability: 0.7
+    _statusEffect: 0
+  - PowerUp: {fileID: 4919733219814430725, guid: 53eee990ccdc20e468bae63dec96072e,
+      type: 3}
+    SpawnProbability: 0.25
+    _statusEffect: 0
+  - PowerUp: {fileID: 4309942276379790735, guid: a37f15d5f4d108a4cae15466aeee0f68,
+      type: 3}
+    SpawnProbability: 0.25
+    _statusEffect: 0
+  - PowerUp: {fileID: 4463859811489805764, guid: 030dcc66509ecb04c81dcb20ed616572,
+      type: 3}
+    SpawnProbability: 0.5
+    _statusEffect: 0
+  - PowerUp: {fileID: 7109547937558746400, guid: 0e941df3a3d378d4f86dc7d0700dfe7e,
+      type: 3}
+    SpawnProbability: 0.1
+    _statusEffect: 0
+  - PowerUp: {fileID: 6108882314280332008, guid: d6206d25f13a5bf479583d2de03ec644,
+      type: 3}
+    SpawnProbability: 0.15
+    _statusEffect: 1
+  _powerUpsObjects: []
+  _probabilityByDifferential100: []
+  _cumulativeProbability: []
 --- !u!4 &1763653211
 Transform:
   m_ObjectHideFlags: 0
@@ -3792,6 +3826,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: ThrusterBlockNegativePowerUp
+      objectReference: {fileID: 0}
+    - target: {fileID: 6108882314280332008, guid: d6206d25f13a5bf479583d2de03ec644,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d6206d25f13a5bf479583d2de03ec644, type: 3}

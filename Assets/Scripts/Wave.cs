@@ -5,10 +5,11 @@ using UnityEngine;
 [System.Serializable]
 public class Wave
 {
+    public enum Difficulty { Normal, Hard, GodMode};
     public int WaveNumber;
     public string Title;
     public int AmountOfEnemiesToBeSpawned;
-    public int Difficulty;
+    public Difficulty DifficultyLevel;
     public bool IsThereABoss;
     
 }

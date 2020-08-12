@@ -23,24 +23,65 @@ public class SpawnManager : MonoBehaviour
     //Wave Elements
     private string _waveTitle;
     private int _amountOfEnemiesInWave;
-    private int _difficulty;//to be set later
+    [SerializeField]
+    private float _difficultyFactor = 1;//to be set later
+    public Wave.Difficulty _waveDifficulty;
     private bool _isThereABossInTheWave = false;
     private bool _waveCompleted;
 
     //UI
     private UIManager _uiManager;
 
+    //SPAWN PROBABILITY
+    [SerializeField]
+    private PowerUpProbability[] _powerUpsProb;
+    [SerializeField]
+    private GameObject[] _powerUpsObjects;
+    private float[] _normalprobabilities;
+    private float[] _difficultyprobabilities;
+    private float _factor;
+    [SerializeField]
+    private float[] _probabilityByDifferential100;
+    [SerializeField]
+    private float[] _cumulativeProbability;
+
+
     private bool _stopSpawning = false;
     private void Start()
     {
+        
         _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
         _actualWave = 1;
         _waveCompleted = false;
         _enemiesSpawned = 0;
         _enemiesDestroyed = 0;
         _amountOfEnemiesInWave = _waves[0].AmountOfEnemiesToBeSpawned;
+        //INITIALIZATION FOR POWERUP ARRRAYS
+        _waveDifficulty = _waves[0].DifficultyLevel;
+        _powerUpsObjects = new GameObject[_powerUpsProb.Length];
+        _normalprobabilities = new float[_powerUpsProb.Length];
+        _difficultyprobabilities = new float[_powerUpsProb.Length];
+        _probabilityByDifferential100 = new float[_powerUpsProb.Length];
+        _cumulativeProbability = new float[_powerUpsProb.Length];
+        SetDifficulty();
+        loadPowerUpPrefabs();
+        PrepareSpawnProbabilities();
     }
-
+    public void SetDifficulty()
+    {
+        switch (_waveDifficulty)
+        {
+            case Wave.Difficulty.Normal:
+                _difficultyFactor = 1;
+                break;
+            case Wave.Difficulty.Hard:
+                _difficultyFactor = 2;
+                break;
+            case Wave.Difficulty.GodMode:
+                _difficultyFactor = 3;
+                break;
+        }
+    }
     public void StartSpawning()
     {
         WaveManager();   
@@ -78,7 +119,7 @@ public class SpawnManager : MonoBehaviour
                 Debug.Log("Entre al for a la wave: " + WaveSelected.WaveNumber);
                 _waveTitle = WaveSelected.Title;
                 _amountOfEnemiesInWave = WaveSelected.AmountOfEnemiesToBeSpawned;
-                _difficulty = WaveSelected.Difficulty;//To be implemented later
+                //_difficulty = WaveSelected.Difficulty;//To be implemented later
                 _isThereABossInTheWave = WaveSelected.IsThereABoss;
                 _uiManager.ActivateAndAnnounceWave(_waveTitle, WaveSelected.WaveNumber, _amountOfEnemiesInWave);
                 _enemiesLeft = _amountOfEnemiesInWave - _enemiesDestroyed;
@@ -143,28 +184,131 @@ public class SpawnManager : MonoBehaviour
         _uiManager.EnemiesLeftUpdate(_enemiesLeft);
     }
 
+    void PrepareSpawnProbabilities()
+    {
+        //get normal probability
+        //check status effect and multiply by difficulty factor
+        //divide the total sum by 100 to get the differential factor
+        //divide the differential factor by each element
+        //build the cumulative probability array
+        getNormalProbabilities();
+        checkStatusEffectAndAddDifficulty();
+        calculateFactor();
+        differentialFactorByEachObject();
+        buildCumulativeArray();
+
+    }
+    void buildCumulativeArray()
+    {
+        for (int i = 0; i < _powerUpsProb.Length; i++)
+        {
+            if (i == 0)
+            {
+                _cumulativeProbability[i] = _probabilityByDifferential100[i];
+            }
+            else
+            {
+                _cumulativeProbability[i]= _cumulativeProbability[i - 1] + _probabilityByDifferential100[i];
+            }
+            
+        }
+    }
+    void differentialFactorByEachObject()
+    {
+        for (int i = 0; i < _powerUpsProb.Length; i++)
+        {
+            _probabilityByDifferential100[i] = _difficultyprobabilities[i] / _factor;
+        }
+    }
+    void calculateFactor()
+    {
+        _factor = 0;
+        for (int i = 0; i < _powerUpsProb.Length; i++)
+        {
+            _factor += _powerUpsProb[i].SpawnProbability;
+        }
+        _factor = _factor / 100;
+    }
+    void getNormalProbabilities()
+    {
+        for (int i = 0; i < _powerUpsProb.Length; i++)
+        {
+            _normalprobabilities[i] = _powerUpsProb[i].SpawnProbability;
+        }
+    }
+    void checkStatusEffectAndAddDifficulty()
+    {
+        //Difficulty factor is only applied to Positive Status Effects
+        for (int i = 0; i < _powerUpsProb.Length; i++)
+        {
+            if (_powerUpsProb[i]._statusEffect == PowerUpProbability.StatusEffect.Positive)
+            {
+                _difficultyprobabilities[i] = _normalprobabilities[i] * _difficultyFactor;
+            }
+            else if (_powerUpsProb[i]._statusEffect == PowerUpProbability.StatusEffect.Negative)
+            {
+                _difficultyprobabilities[i] = _normalprobabilities[i];
+            }
+            
+        }
+    }
+    void loadPowerUpPrefabs()
+    {
+      
+        for(int i = 0; i < _powerUpsProb.Length; i++)
+        {
+            _powerUpsObjects[i] = _powerUpsProb[i].PowerUp;
+        }
+        
+    }
+
+    //IEnumerator SpawnPowerUpRoutine()
+    //{
+    //    yield return new WaitForSeconds(3.0f);
+    //    while (_stopSpawning == false)
+    //    {
+    //        Vector3 postToSpawn = new Vector3(Random.Range(-8f, 8f), 7, 0);
+
+    //        int randomPowerUp;
+    //        if(Random.value <= 0.4)
+    //        {
+    //            //40% chance to Spawn the last prefab
+    //            randomPowerUp = Random.Range(0, _PowerUpPrefabs.Length); //Changed to match PowerUpPrefabs added to the list
+    //        }
+    //        else
+    //        {
+    //            //Do not Spawn Last PowerUp MissileShot
+    //            randomPowerUp = Random.Range(0, _PowerUpPrefabs.Length-1); //Changed to match PowerUpPrefabs added to the list
+    //        }
+
+    //        Instantiate(_PowerUpPrefabs[randomPowerUp], postToSpawn, Quaternion.identity);
+    //        yield return new WaitForSeconds(Random.Range(3, 8));
+    //    }
+    //}
     IEnumerator SpawnPowerUpRoutine()
     {
         yield return new WaitForSeconds(3.0f);
         while (_stopSpawning == false)
         {
             Vector3 postToSpawn = new Vector3(Random.Range(-8f, 8f), 7, 0);
-
-            int randomPowerUp;
-            if(Random.value <= 0.4)
-            {
-                //40% chance to Spawn the last prefab
-                randomPowerUp = Random.Range(0, _PowerUpPrefabs.Length); //Changed to match PowerUpPrefabs added to the list
-            }
-            else
-            {
-                //Do not Spawn Last PowerUp MissileShot
-                randomPowerUp = Random.Range(0, _PowerUpPrefabs.Length-1); //Changed to match PowerUpPrefabs added to the list
-            }
-
-            Instantiate(_PowerUpPrefabs[randomPowerUp], postToSpawn, Quaternion.identity);
+            Instantiate(GetRandomPowerUp(), postToSpawn, Quaternion.identity);
             yield return new WaitForSeconds(Random.Range(3, 8));
         }
+    }
+    GameObject GetRandomPowerUp()
+    {
+        float rnd = Random.Range(0, 100f);
+        int itemCount = _cumulativeProbability.Length;
+
+        for (int i = 0; i <= itemCount; i++)
+        {
+            if (rnd <= _cumulativeProbability[i])
+            {
+                return _powerUpsObjects[i];
+            }
+        }
+
+        return null;
     }
 
     public void OnPlayerDeath()
