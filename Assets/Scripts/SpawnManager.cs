@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
 {
+    #region Variables
     [SerializeField]
-    private GameObject _enemyPrefab;
+    private GameObject _enemyPrefab=default;
     [SerializeField]
     private GameObject[] _PowerUpPrefabs;
     [SerializeField]
@@ -32,9 +33,9 @@ public class SpawnManager : MonoBehaviour
     //UI
     private UIManager _uiManager;
 
-    //SPAWN PROBABILITY
+    //SPAWN POWERUP PROBABILITY
     [SerializeField]
-    private PowerUpProbability[] _powerUpsProb;
+    private PowerUpProbability[] _powerUpsProb=default;
     [SerializeField]
     private GameObject[] _powerUpsObjects;
     private float[] _normalprobabilities;
@@ -45,8 +46,23 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private float[] _cumulativeProbability;
 
+    //SPAWN ENEMY PROBABILITY
+    [SerializeField]
+    private EnemyProbability[] _enemyProb = default;
+    [SerializeField]
+    private GameObject[] _enemiesObjects;
+    private float[] _normalEnemyProbabilities;
+    private float[] _difficultyEnemyProbabilities;
+    private float _enemyFactor;
+    [SerializeField]
+    private float[] _enemyProbabilityByDifferential100;
+    [SerializeField]
+    private float[] _enemyCumulativeProbability;
+
 
     private bool _stopSpawning = false;
+    #endregion
+    #region StartAndUpdate
     private void Start()
     {
         
@@ -56,32 +72,31 @@ public class SpawnManager : MonoBehaviour
         _enemiesSpawned = 0;
         _enemiesDestroyed = 0;
         _amountOfEnemiesInWave = _waves[0].AmountOfEnemiesToBeSpawned;
-        //INITIALIZATION FOR POWERUP ARRRAYS
+        
         _waveDifficulty = _waves[0].DifficultyLevel;
-        _powerUpsObjects = new GameObject[_powerUpsProb.Length];
-        _normalprobabilities = new float[_powerUpsProb.Length];
-        _difficultyprobabilities = new float[_powerUpsProb.Length];
-        _probabilityByDifferential100 = new float[_powerUpsProb.Length];
-        _cumulativeProbability = new float[_powerUpsProb.Length];
+        //INITIALIZATION FOR POWERUP ARRRAYS
+        int powerUpLength = _powerUpsProb.Length;
+        _powerUpsObjects = new GameObject[powerUpLength];
+        _normalprobabilities = new float[powerUpLength];
+        _difficultyprobabilities = new float[powerUpLength];
+        _probabilityByDifferential100 = new float[powerUpLength];
+        _cumulativeProbability = new float[powerUpLength];
+        //INITIALIZATION FOR ENEMIES ARRAY
+        int enemyLength = _enemyProb.Length;
+        _enemiesObjects = new GameObject[enemyLength];
+        _normalEnemyProbabilities = new float[enemyLength];
+        _difficultyEnemyProbabilities = new float[enemyLength];
+        _enemyProbabilityByDifferential100 = new float[enemyLength];
+        _enemyCumulativeProbability = new float[enemyLength];
+
+
         SetDifficulty();
+        loadEnemyPrefabs();
         loadPowerUpPrefabs();
+        PrepareEnemySpawnProbabilities();
         PrepareSpawnProbabilities();
     }
-    public void SetDifficulty()
-    {
-        switch (_waveDifficulty)
-        {
-            case Wave.Difficulty.Normal:
-                _difficultyFactor = 1;
-                break;
-            case Wave.Difficulty.Hard:
-                _difficultyFactor = 2;
-                break;
-            case Wave.Difficulty.GodMode:
-                _difficultyFactor = 3;
-                break;
-        }
-    }
+    
     public void StartSpawning()
     {
         WaveManager();   
@@ -96,27 +111,28 @@ public class SpawnManager : MonoBehaviour
             _enemiesSpawned = 0;
             _enemiesDestroyed = 0;
             _actualWave++;
-            Debug.Log("New Actual Wave: " + _actualWave);
-            Debug.Log("Voy a llamar otra vez al Wave Manager");
+           // Debug.Log("New Actual Wave: " + _actualWave);
+            //Debug.Log("Voy a llamar otra vez al Wave Manager");
             WaveManager();
             //StartCoroutine(WaitForNewWave());
         }
         //Check if all the enemies have been spawned and if there are no enemies left in the field
         if (_enemiesSpawned == _amountOfEnemiesInWave && (_enemiesLeft <= 0))
         {
-            Debug.Log("Termine la Oleada");
+            //Debug.Log("Termine la Oleada");
             _waveCompleted = true;
         }
     }
-
+    #endregion
+    #region EnemyWaveManager
     void WaveManager()
     {
-        Debug.Log("Entre al WaveManager");
+        //Debug.Log("Entre al WaveManager");
         foreach(Wave WaveSelected in _waves)
         {
             if (WaveSelected.WaveNumber==_actualWave)
             {
-                Debug.Log("Entre al for a la wave: " + WaveSelected.WaveNumber);
+                // Debug.Log("Entre al for a la wave: " + WaveSelected.WaveNumber);
                 _waveTitle = WaveSelected.Title;
                 _amountOfEnemiesInWave = WaveSelected.AmountOfEnemiesToBeSpawned;
                 //_difficulty = WaveSelected.Difficulty;//To be implemented later
@@ -145,7 +161,7 @@ public class SpawnManager : MonoBehaviour
         //yield return null;//espera 1 segundo
         //Instantiate Enemies prefabs
         
-        Debug.Log("EstamosEsperando 5 segundos");
+        //Debug.Log("EstamosEsperando 5 segundos");
         yield return new WaitForSeconds(5.0f);
         while ((_stopSpawning == false) || (_waveCompleted == false))
         {
@@ -153,13 +169,13 @@ public class SpawnManager : MonoBehaviour
             //Debug.Log("Entramos al while infinito hasta terminar la oleada o morir");
             if ((_enemiesSpawned <= _amountOfEnemiesInWave - 1) && (_stopSpawning==false))
             {
-                Debug.Log("Estoy creando al enemigo: " + (_enemiesSpawned + 1));
+               // Debug.Log("Estoy creando al enemigo: " + (_enemiesSpawned + 1));
                 Vector3 posToSpawn = new Vector3(Random.Range(-8.0f, 8.0f), 7, 0);
-                GameObject newEnemy = Instantiate(_enemyPrefab, posToSpawn, Quaternion.identity); //almacenar en una variable el enemigo creado
+                GameObject newEnemy = Instantiate(GetRandomEnemy(), posToSpawn, Quaternion.identity); //almacenar en una variable el enemigo creado
                 newEnemy.transform.parent = _enemyContainer.transform;
 
                 _enemiesSpawned++;
-                Debug.Log("Enemies Spawned: " + _enemiesSpawned);
+                //Debug.Log("Enemies Spawned: " + _enemiesSpawned);
                 
                 
                // Debug.Log("Enemies Spawned: " + _enemiesSpawned);
@@ -175,6 +191,21 @@ public class SpawnManager : MonoBehaviour
             
 
     }
+    GameObject GetRandomEnemy()
+    {
+        float rnd = Random.Range(0, 100f);
+        int itemCount = _enemyCumulativeProbability.Length;
+
+        for (int i = 0; i <= itemCount; i++)
+        {
+            if (rnd <= _enemyCumulativeProbability[i])
+            {
+                return _enemiesObjects[i];
+            }
+        }
+
+        return null;
+    }
 
     public void EnemyDestroyedReport()
     {
@@ -183,7 +214,103 @@ public class SpawnManager : MonoBehaviour
         _enemiesLeft = _amountOfEnemiesInWave - _enemiesDestroyed;
         _uiManager.EnemiesLeftUpdate(_enemiesLeft);
     }
+    #endregion
+    #region EnemySpawnProbabilityCalculations
 
+    public void SetDifficulty()
+    {
+        switch (_waveDifficulty)
+        {
+            case Wave.Difficulty.Normal:
+                _difficultyFactor = 1;
+                break;
+            case Wave.Difficulty.Hard:
+                _difficultyFactor = 2;
+                break;
+            case Wave.Difficulty.GodMode:
+                _difficultyFactor = 3;
+                break;
+        }
+    }
+    void PrepareEnemySpawnProbabilities()
+    {
+        //get normal probability
+        //check status effect and multiply by difficulty factor
+        //divide the total sum by 100 to get the differential factor
+        //divide the differential factor by each element
+        //build the cumulative probability array
+        getEnemyNormalProbabilities();
+        checkEnemyStatusEffectAndAddDifficulty();
+        calculateEnemyFactor();
+        EnemydifferentialFactorByEachObject();
+        buildEnemyCumulativeArray();
+
+    }
+    void buildEnemyCumulativeArray()
+    {
+        for (int i = 0; i < _enemyProb.Length; i++)
+        {
+            if (i == 0)
+            {
+                _enemyCumulativeProbability[i] = _enemyProbabilityByDifferential100[i];
+            }
+            else
+            {
+                _enemyCumulativeProbability[i] = _enemyCumulativeProbability[i - 1] + _enemyProbabilityByDifferential100[i];
+            }
+
+        }
+    }
+    void EnemydifferentialFactorByEachObject()
+    {
+        for (int i = 0; i < _enemyProb.Length; i++)
+        {
+            _enemyProbabilityByDifferential100[i] = _difficultyEnemyProbabilities[i] / _factor;
+        }
+    }
+    void calculateEnemyFactor()
+    {
+        _factor = 0;
+        for (int i = 0; i < _enemyProb.Length; i++)
+        {
+            _factor += _enemyProb[i].spawnProbability;
+        }
+        _factor = _factor / 100;
+    }
+    void getEnemyNormalProbabilities()
+    {
+        for (int i = 0; i < _enemyProb.Length; i++)
+        {
+            _normalEnemyProbabilities[i] = _enemyProb[i].spawnProbability;
+        }
+    }
+    void checkEnemyStatusEffectAndAddDifficulty()
+    {
+        //Difficulty factor is only applied to Positive Status Effects
+        for (int i = 0; i < _enemyProb.Length; i++)
+        {
+           // if (_enemyProb[i]._statusEffect == PowerUpProbability.StatusEffect.Positive)
+            //{
+            //    _difficultyprobabilities[i] = _normalprobabilities[i] * _difficultyFactor;
+            //}
+            //else if (_enemyProb[i]._statusEffect == PowerUpProbability.StatusEffect.Negative)
+            //{
+                _difficultyEnemyProbabilities[i] = _normalEnemyProbabilities[i];
+            //}
+
+        }
+    }
+    void loadEnemyPrefabs()
+    {
+
+        for (int i = 0; i < _enemyProb.Length; i++)
+        {
+            _enemiesObjects[i] = _enemyProb[i].Enemy;
+        }
+
+    }
+#endregion
+    #region PowerUpProbabilityCalculations
     void PrepareSpawnProbabilities()
     {
         //get normal probability
@@ -243,7 +370,7 @@ public class SpawnManager : MonoBehaviour
         {
             if (_powerUpsProb[i]._statusEffect == PowerUpProbability.StatusEffect.Positive)
             {
-                _difficultyprobabilities[i] = _normalprobabilities[i] * _difficultyFactor;
+                _difficultyprobabilities[i] = _normalprobabilities[i] / _difficultyFactor;
             }
             else if (_powerUpsProb[i]._statusEffect == PowerUpProbability.StatusEffect.Negative)
             {
@@ -261,7 +388,7 @@ public class SpawnManager : MonoBehaviour
         }
         
     }
-
+    #endregion
     //IEnumerator SpawnPowerUpRoutine()
     //{
     //    yield return new WaitForSeconds(3.0f);
@@ -313,7 +440,7 @@ public class SpawnManager : MonoBehaviour
 
     public void OnPlayerDeath()
     {
-        Debug.Log("PlayerDead");
+        //Debug.Log("PlayerDead");
         _stopSpawning = true;
     }
 

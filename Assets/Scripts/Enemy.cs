@@ -6,6 +6,7 @@ public class Enemy : MonoBehaviour
 {
     enum EnemyType {Normal, Excalibur };
     enum EnemyAttack { Laser, Mine, Ram};
+    enum EnemyDefense { None, Shield, Dodge};
     enum EnemyMovement {linear, circle, zigzag };
     [SerializeField]
     private float _speed = 4.0f;
@@ -27,6 +28,13 @@ public class Enemy : MonoBehaviour
     private EnemyMovement _enemyMovement = EnemyMovement.linear;
     [SerializeField]
     private EnemyAttack _enemyAttack = EnemyAttack.Laser;
+    [SerializeField]
+    private EnemyDefense _enemyDefense = EnemyDefense.None;
+
+    //Enemy Sprites
+    //[SerializeField]
+    public Sprite[] _enemySprites=default;
+    private Vector3 _linearDirection;
 
     //MOVEMENTS
     private Vector3 _pos;
@@ -47,10 +55,23 @@ public class Enemy : MonoBehaviour
     private bool _dead = false;
     //Contact SpawnManager
     SpawnManager _spawnManager;
+
+    //ENEMY SHIELDS
+    private bool _shieldActive=false;
+
+    private void Awake()
+    {
+       
+    }
+    private void OnEnable()
+    {
+       
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-
+        //SetEnemyType();
         _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
         _player = GameObject.Find("Player").GetComponent<Player>();
         _audioSource = GetComponent<AudioSource>();
@@ -70,8 +91,65 @@ public class Enemy : MonoBehaviour
         //_axis = transform.right; //Takes in consideration the rotation of an object
         _axis = Vector3.right;
         //Debug.Log("Transform.Right: " + _axis);
+
+
+        EnemyDefenseSet();
+        SetEnemyType();
+    }
+    private void OnGUI()
+    {
+        
+    }
+    void SetEnemyType()
+    {
+        switch (_enemyType)
+        {
+            case EnemyType.Normal:
+                _anim.SetTrigger("NormalEnemy");
+                //this.gameObject.GetComponent<Animator>().enabled = false;
+                this.gameObject.GetComponent<SpriteRenderer>().sprite = _enemySprites[0];
+                _linearDirection = Vector3.down;
+                //this.gameObject.GetComponent<Animator>().enabled = true;
+                break;
+            case EnemyType.Excalibur:
+                //this.gameObject.GetComponent<Animator>().enabled = false;
+                _anim.SetTrigger("ExcaliburEnemy");
+                //this.gameObject.GetComponent<SpriteRenderer>().sprite = _enemySprites[1];
+                transform.rotation = Quaternion.Euler(Vector3.forward * 90);
+                transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
+                this.gameObject.GetComponent<BoxCollider2D>().size = new Vector2(7f, 7f);
+
+                //this.gameObject.GetComponent<Animator>().enabled = true;
+                _linearDirection = Vector3.left;
+                break;
+            
+        }
     }
 
+    public void ActivateShields()
+    {
+        _shieldActive = true;
+        transform.GetChild(1).gameObject.SetActive(true);
+        if(_enemyType == EnemyType.Excalibur)
+        {
+            transform.GetChild(1).gameObject.transform.localScale = new Vector3(5f, 4f, 1f);
+        }
+        //ActivateComponentShields
+    }
+    public void EnemyDefenseSet()
+    {
+        switch (_enemyDefense)
+        {
+            case EnemyDefense.None:
+                //Do nothing or set false maybe, We'll see
+                break;
+            case EnemyDefense.Shield:
+                ActivateShields();
+                break;
+            case EnemyDefense.Dodge:
+                break;
+        }
+    }
     // Update is called once per frame
     void Update()
     {
@@ -130,7 +208,8 @@ public class Enemy : MonoBehaviour
     }
     void linearMovement()
     {
-        transform.Translate(Vector3.down * _speed * Time.deltaTime);
+        
+        transform.Translate(_linearDirection * _speed * Time.deltaTime);
         if (transform.position.y < -5f)
         {
             float randomX = Random.Range(-8.0f, 8.0f);
@@ -178,7 +257,7 @@ public class Enemy : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         // Este debug esta super util para saber con que objeto esta colisionando
-       // Debug.Log("Hit: " + other.transform.name);
+        // Debug.Log("Hit: " + other.transform.name);
         //if other is Player
         //Damage player
         //Destroy us
@@ -186,11 +265,13 @@ public class Enemy : MonoBehaviour
         //if other is laser
         //destroy laser
         //Destroy us
-
-        if(other.tag == "Player")
+        //Debug.Log("Me golpearon");
+        //this.gameObject.GetComponent<Animator>().enabled = true;
+        if (other.tag == "Player")
         {
             //Damage Player
             //Version optimizada para evitar errores
+            transform.GetChild(1).gameObject.SetActive(false);
             Player player = other.transform.GetComponent<Player>();
             if(player != null)
             {
@@ -202,30 +283,45 @@ public class Enemy : MonoBehaviour
             _speed = 0; //para detener el objeto
             _audioSource.Play();
             _dead = true;
-            Destroy(GetComponent<Collider2D>());
+            Destroy(GetComponent<Collider2D>(),0.5f);
             _spawnManager.EnemyDestroyedReport();
             Destroy(this.gameObject,2.6f);
             
         }
-
-        if (other.tag == "Laser" || other.tag == "Missile") {
-
-            Destroy(other.gameObject);
-            if(_player != null)
-            {
-
-                _player.AddScore(10);
-            }
-            _anim.SetTrigger("OnEnemyDeath");
-            _speed = 0;
-            _audioSource.Play();
-            _dead = true;
-            Destroy(GetComponent<Collider2D>());
-            transform.GetChild(0).gameObject.SetActive(false);
-            _spawnManager.EnemyDestroyedReport();
-            Destroy(this.gameObject,2.6f);
-        }
+        //With the shields if it hits the player is a kamikaze move, the enemy ship gets destroyed
+        /// if hit by a laser or missile resist one hit and remove the shield
         
+            //receive full blow
+            if (other.tag == "Laser" || other.tag == "Missile")
+            {
+            if (_shieldActive)
+            {
+                //dont receive damage just remove the shield
+                _shieldActive = false;
+                transform.GetChild(1).gameObject.SetActive(false);
+                //disable Component
+                Destroy(other.gameObject);
+            }
+            else
+            {
+               
+                if (_player != null)
+                {
+
+                    _player.AddScore(10);
+                }
+                _anim.SetTrigger("OnEnemyDeath");
+                _speed = 0;
+                _audioSource.Play();
+                _dead = true;
+                Destroy(GetComponent<Collider2D>(),0.5f);
+                transform.GetChild(0).gameObject.SetActive(false);
+                _spawnManager.EnemyDestroyedReport();
+                Destroy(this.gameObject, 2.6f);
+            }
+
+        }
+
 
 
     }

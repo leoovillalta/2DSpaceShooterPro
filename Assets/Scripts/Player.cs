@@ -14,7 +14,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _laserPrefab;
     [SerializeField]
-    private GameObject _tripleShotPrefab;
+    private GameObject _tripleShotPrefab=default;
     [SerializeField]
     private float _fireRate = 0.5f;
     [SerializeField]
@@ -22,7 +22,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     private int _lives = 3;
     [SerializeField]
-    private GameObject _playerShield;
+    private GameObject _playerShield=default;
 
     private int _initialLives;
     [SerializeField]
@@ -31,7 +31,9 @@ public class Player : MonoBehaviour
 
 
     [SerializeField]
-    private GameObject _rightEngine, _leftEngine;
+    private GameObject _rightEngine = default;
+    [SerializeField]
+    private GameObject _leftEngine=default;
     [SerializeField]
     private float _increasedRate = 3f;
 

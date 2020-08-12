@@ -6,24 +6,24 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
     [SerializeField]
-    private Text _ScoreText;
+    private Text _ScoreText=default;
     [SerializeField]
-    private Image _LivesImg;
+    private Image _LivesImg=default;
     [SerializeField]
-    private Sprite[] _liveSprites;
+    private Sprite[] _liveSprites=default;
     [SerializeField]
-    private Text _gameOverText;
+    private Text _gameOverText=default;
     [SerializeField]
-    private Text _restartText;
+    private Text _restartText=default;
    
 
     //Shields
     [SerializeField]
     private GameObject _shieldsUI;
     [SerializeField]
-    private Image _shieldDamageBar;
+    private Image _shieldDamageBar=default;
     [SerializeField]
-    private Text _shieldPercentage;
+    private Text _shieldPercentage=default;
 
     //AMMO
     [SerializeField]
@@ -40,7 +40,7 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Text _FullPowerThrustersText;
     [SerializeField]
-    private GameObject _thrustersBar;
+    private GameObject _thrustersBar=default;
     [SerializeField]
     private Slider _thrusterBarSlider;
     private Animator _thrusterAnim;
@@ -50,17 +50,17 @@ public class UIManager : MonoBehaviour
 
     //WAVE
     [SerializeField]
-    private Text _waveCounter;
+    private Text _waveCounter=default;
     [SerializeField]
-    private Text _waveTitle;
+    private Text _waveTitle=default;
     [SerializeField]
     private GameObject _waveObject;
     private Animator _waveAnim;
     [SerializeField]
-    private Text _totalEnemiesInWave;
+    private Text _totalEnemiesInWave=default;
 
     [SerializeField]
-    private Text _enemiesLeftCounter;
+    private Text _enemiesLeftCounter=default;
 
     private GameManager _gameManager;
     // Start is called before the first frame update

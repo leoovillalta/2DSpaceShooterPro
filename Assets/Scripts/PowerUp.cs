@@ -10,7 +10,7 @@ public class PowerUp : MonoBehaviour
     [SerializeField]
     private float _speed = 3.0f;
     [SerializeField]
-    private AudioClip _clip;
+    private AudioClip _clip=default;
     // Start is called before the first frame update
     void Start()
     {
