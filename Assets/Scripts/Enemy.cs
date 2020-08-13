@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    enum Aggresivity { Normal,Aggresive};
     enum EnemyType {Normal, Excalibur };
-    enum EnemyAttack { Laser, Mine, Ram};
+    enum EnemyAttack { Laser, Mine, Ram, None};
     enum EnemyDefense { None, Shield, Dodge};
-    enum EnemyMovement {linear, circle, zigzag };
+    enum EnemyMovement {linear, circle, zigzag, None};
     [SerializeField]
     private float _speed = 4.0f;
     private Player _player;
@@ -30,6 +31,8 @@ public class Enemy : MonoBehaviour
     private EnemyAttack _enemyAttack = EnemyAttack.Laser;
     [SerializeField]
     private EnemyDefense _enemyDefense = EnemyDefense.None;
+    [SerializeField]
+    private Aggresivity _aggresivity = Aggresivity.Normal;
 
     //Enemy Sprites
     //[SerializeField]
@@ -58,6 +61,29 @@ public class Enemy : MonoBehaviour
 
     //ENEMY SHIELDS
     private bool _shieldActive=false;
+
+    //AGGRESIVE ENEMY AND RAM
+    private EnemyAttack _previousAttack;
+    private EnemyMovement _previousEnemyMovement;
+    private bool _playerDetected = false;
+    private bool _ramAttack = false;
+    [SerializeField]
+    private float _rammingSpeed=6.0f;
+
+    private float _previousSpeed;
+    
+    private GameObject _target;
+    [SerializeField]
+    private float _offsetAim = 0;
+
+    private Vector3 _targetPos;
+    private Vector3 _myPos;
+    private float angle;
+
+    private Vector2 _targetV2pos;
+
+    private Animator _radarAnim;
+
 
     private void Awake()
     {
@@ -92,8 +118,13 @@ public class Enemy : MonoBehaviour
         _axis = Vector3.right;
         //Debug.Log("Transform.Right: " + _axis);
 
+        //Valores Originales
+        _previousSpeed = _speed;
+        _previousAttack = _enemyAttack;
+        _previousEnemyMovement = _enemyMovement;
 
         EnemyDefenseSet();
+        EnemyAggresiveSet();
         SetEnemyType();
     }
     private void OnGUI()
@@ -109,16 +140,19 @@ public class Enemy : MonoBehaviour
                 //this.gameObject.GetComponent<Animator>().enabled = false;
                 this.gameObject.GetComponent<SpriteRenderer>().sprite = _enemySprites[0];
                 _linearDirection = Vector3.down;
+                transform.rotation = Quaternion.identity;
                 //this.gameObject.GetComponent<Animator>().enabled = true;
+                _offsetAim = 90;
                 break;
             case EnemyType.Excalibur:
                 //this.gameObject.GetComponent<Animator>().enabled = false;
                 _anim.SetTrigger("ExcaliburEnemy");
                 //this.gameObject.GetComponent<SpriteRenderer>().sprite = _enemySprites[1];
+                transform.rotation = Quaternion.identity;
                 transform.rotation = Quaternion.Euler(Vector3.forward * 90);
                 transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
                 this.gameObject.GetComponent<BoxCollider2D>().size = new Vector2(7f, 7f);
-
+                _offsetAim = 180;
                 //this.gameObject.GetComponent<Animator>().enabled = true;
                 _linearDirection = Vector3.left;
                 break;
@@ -150,9 +184,35 @@ public class Enemy : MonoBehaviour
                 break;
         }
     }
+    public void EnemyAggresiveSet()
+    {
+        switch (_aggresivity)
+        {
+            case Aggresivity.Normal:
+                //Do nothing or set false maybe, We'll see
+                break;
+            case Aggresivity.Aggresive:
+                AggresiveSet();
+                break;
+        }
+    }
+    void AggresiveSet()
+    {
+        transform.GetChild(2).gameObject.SetActive(true);
+        if (_enemyType == EnemyType.Excalibur)
+        {
+            transform.GetChild(2).gameObject.transform.localScale = new Vector3(3f, 3f, 1f);
+        }
+    }
     // Update is called once per frame
     void Update()
     {
+        if (_playerDetected)
+        {
+           
+            _enemyAttack = EnemyAttack.Ram;
+            _enemyMovement = EnemyMovement.None;
+        }
         CalculateMovement();
         EnemyAttackType();
     }
@@ -175,6 +235,41 @@ public class Enemy : MonoBehaviour
         }
 
     }
+    void RamAttack()
+    {
+        //Get Player direction
+        //block direction after 0.5 s
+        //fire away in the given direction
+        //When out of screen reset to normal
+
+       _radarAnim= transform.GetChild(2).gameObject.transform.GetChild(0).gameObject.transform.GetComponent<Animator>();
+        _radarAnim.SetBool("PlayerDetected", true);
+        lockOnPlayer();
+        _ramAttack = true;
+    }
+    void lockOnPlayer()
+    {
+        
+        _targetPos = _player.transform.position;
+        _myPos = transform.position;
+        _targetPos.x = _targetPos.x - _myPos.x;
+        _targetPos.y = _targetPos.y - _myPos.y;
+        angle = Mathf.Atan2(_targetPos.y, _targetPos.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle + _offsetAim));
+        StartCoroutine(LockOnWait());
+    }
+    IEnumerator LockOnWait()
+    {
+        yield return new WaitForSeconds(1f);
+        ChargeRam();
+    }
+    void ChargeRam()
+    {
+        _speed = _rammingSpeed;
+        _enemyAttack = EnemyAttack.None;
+        _enemyMovement = EnemyMovement.linear;
+        _playerDetected = false;
+    }
 
     void EnemyAttackType()
     {
@@ -187,6 +282,10 @@ public class Enemy : MonoBehaviour
                 MineDeploy();
                 break;
             case EnemyAttack.Ram:
+                RamAttack();
+                break;
+            case EnemyAttack.None:
+                //Do nothing
                 break;
         }
     }
@@ -204,19 +303,41 @@ public class Enemy : MonoBehaviour
             case EnemyMovement.zigzag:
                 zigzagMovement2();
                 break;
+            case EnemyMovement.None:
+                //Let The Ram attack do all the work
+                break;
         }
     }
     void linearMovement()
     {
         
         transform.Translate(_linearDirection * _speed * Time.deltaTime);
-        if (transform.position.y < -5f)
+        // if (transform.position.y < -5f)
+        if(OffBoundaries(transform.position.x,transform.position.y))
         {
+            if (_ramAttack)
+            {
+                //Debug.Log("Entre a resetear los valores");
+                _radarAnim.SetBool("PlayerDetected", false);
+                _ramAttack = false;
+                SetEnemyType();
+                _enemyAttack = _previousAttack;
+                _enemyMovement = _previousEnemyMovement;
+                _speed = _previousSpeed;
+                //transform.GetChild(2).gameObject.transform.GetChild(0).gameObject.transform.GetComponent<CircleCollider2D>().enabled = true;
+                
+            }
             float randomX = Random.Range(-8.0f, 8.0f);
             transform.position = new Vector3(randomX, 7, 0);
+           
+
         }
     }
-
+    bool OffBoundaries(float x, float y)
+    {
+        if (y < -5f || y > 10f || x < -12f || x > 12f) return true;
+        return false;
+    }
     void zigzagMovement2()
     {
         _pos += Vector3.down * Time.deltaTime * _speed;
@@ -272,6 +393,7 @@ public class Enemy : MonoBehaviour
             //Damage Player
             //Version optimizada para evitar errores
             transform.GetChild(1).gameObject.SetActive(false);
+            transform.GetChild(2).gameObject.SetActive(false);
             Player player = other.transform.GetComponent<Player>();
             if(player != null)
             {
@@ -299,6 +421,8 @@ public class Enemy : MonoBehaviour
                 //dont receive damage just remove the shield
                 _shieldActive = false;
                 transform.GetChild(1).gameObject.SetActive(false);
+                
+                //transform.GetChild(2).gameObject.transform.GetChild(0).gameObject.transform.GetComponent<SpriteRenderer>().enabled = false;
                 //disable Component
                 Destroy(other.gameObject);
             }
@@ -314,6 +438,7 @@ public class Enemy : MonoBehaviour
                 _speed = 0;
                 _audioSource.Play();
                 _dead = true;
+                transform.GetChild(2).gameObject.SetActive(false);
                 Destroy(GetComponent<Collider2D>(),0.5f);
                 transform.GetChild(0).gameObject.SetActive(false);
                 _spawnManager.EnemyDestroyedReport();
@@ -328,6 +453,13 @@ public class Enemy : MonoBehaviour
     public void LockedOn()
     {
         transform.GetChild(0).gameObject.SetActive(true);
+        if (_enemyType == EnemyType.Excalibur)
+        {
+            transform.GetChild(0).gameObject.transform.localScale = new Vector3(5f, 5f, 1f);
+        }
     }
-
+    public void PlayerDetected()
+    {
+        _playerDetected = true;
+    }
 }
