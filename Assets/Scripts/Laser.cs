@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Laser : MonoBehaviour
 {
-    enum gameObjectType {Player,Enemy};
+    enum gameObjectType {Player,Enemy,EnemyBackFire};
     [SerializeField]
     gameObjectType GameTag = gameObjectType.Player;
     [SerializeField]
@@ -18,7 +18,7 @@ public class Laser : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(GameTag == gameObjectType.Player)
+        if(GameTag == gameObjectType.Player || GameTag == gameObjectType.EnemyBackFire)
         {
             MoveUp();
         }
@@ -60,7 +60,7 @@ public class Laser : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if(other.tag == "Player" && GameTag == gameObjectType.Enemy)
+        if(other.tag == "Player" && (GameTag == gameObjectType.Enemy || GameTag == gameObjectType.EnemyBackFire))
         {
             Player player = other.GetComponent<Player>();
             if(player != null)

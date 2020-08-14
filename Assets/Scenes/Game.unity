@@ -1207,26 +1207,22 @@ PrefabInstance:
     - target: {fileID: -8790241142499210537, guid: a60838d63d369494c9ea03531e4313c6,
         type: 3}
       propertyPath: _aggresivity
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: -8790241142499210537, guid: a60838d63d369494c9ea03531e4313c6,
         type: 3}
-      propertyPath: _enemyAttack
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1985677498, guid: a60838d63d369494c9ea03531e4313c6, type: 3}
-      propertyPath: m_IsActive
-      value: 0
+      propertyPath: _enemyMovement
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 962009173821354668, guid: a60838d63d369494c9ea03531e4313c6,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.41
+      value: -4.9
       objectReference: {fileID: 0}
     - target: {fileID: 962009173821354668, guid: a60838d63d369494c9ea03531e4313c6,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.58
+      value: -3.77
       objectReference: {fileID: 0}
     - target: {fileID: 962009173821354668, guid: a60838d63d369494c9ea03531e4313c6,
         type: 3}

@@ -4,11 +4,15 @@ using UnityEngine;
 
 public class Radar : MonoBehaviour
 {
+    enum RadarType { CircleRadar, BackScanner, FrontScanner};
+    [SerializeField]
+    private RadarType _type = RadarType.CircleRadar;
     private Enemy _enemy;
     // Start is called before the first frame update
     void Start()
     {
-        _enemy = transform.root.gameObject.GetComponent<Enemy>();
+        //_enemy = transform.root.gameObject.GetComponent<Enemy>();
+        _enemy = transform.parent.gameObject.transform.parent.gameObject.GetComponent<Enemy>();
     }
 
     // Update is called once per frame
@@ -18,10 +22,20 @@ public class Radar : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if(other.tag == "Player")
+        switch (_type)
         {
-            Debug.Log("Player detected");
-            _enemy.PlayerDetected();
+            case RadarType.CircleRadar:
+                if (other.tag == "Player")
+                    _enemy.PlayerDetected();
+                break;
+            case RadarType.BackScanner:
+                if (other.tag == "Player")
+                    _enemy.BackFire();
+                break;
+            case RadarType.FrontScanner:
+                //To be implemented for the frontal actions evasion and shooting pickups
+                break;
         }
+        
     }
 }

@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    enum Aggresivity { Normal,Aggresive};
+    #region Variables
+    enum Aggresivity { Normal,Aggresive, Smart};
     enum EnemyType {Normal, Excalibur };
     enum EnemyAttack { Laser, Mine, Ram, None};
     enum EnemyDefense { None, Shield, Dodge};
@@ -84,17 +85,16 @@ public class Enemy : MonoBehaviour
 
     private Animator _radarAnim;
 
+    //SmartEnemy
+    private bool _backScannerDetection = false;
+    [SerializeField]
+    private GameObject _laserUp;
+    private Animator _backScannerAnim;
 
-    private void Awake()
-    {
-       
-    }
-    private void OnEnable()
-    {
-       
-    }
 
-    // Start is called before the first frame update
+    #endregion
+
+    #region StartAndUpdate
     void Start()
     {
         //SetEnemyType();
@@ -127,10 +127,27 @@ public class Enemy : MonoBehaviour
         EnemyAggresiveSet();
         SetEnemyType();
     }
-    private void OnGUI()
+    void Update()
     {
-        
+        if (_playerDetected)
+        {
+
+            _enemyAttack = EnemyAttack.Ram;
+            _enemyMovement = EnemyMovement.None;
+        }
+        CalculateMovement();
+        EnemyAttackType();
+        if (_backScannerDetection)
+        {
+            _backScannerDetection = false;
+            _backScannerAnim = transform.GetChild(3).gameObject.transform.GetChild(0).gameObject.transform.GetComponent<Animator>();
+            _backScannerAnim.SetBool("BackScanDetected", true);
+
+            FireLaserOnceUP();
+        }
     }
+    #endregion
+    #region Sets
     void SetEnemyType()
     {
         switch (_enemyType)
@@ -151,7 +168,11 @@ public class Enemy : MonoBehaviour
                 transform.rotation = Quaternion.identity;
                 transform.rotation = Quaternion.Euler(Vector3.forward * 90);
                 transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
-                this.gameObject.GetComponent<BoxCollider2D>().size = new Vector2(7f, 7f);
+                if(this.gameObject.GetComponent<BoxCollider2D>() != null)
+                {
+                    this.gameObject.GetComponent<BoxCollider2D>().size = new Vector2(7f, 7f);
+                }
+               
                 _offsetAim = 180;
                 //this.gameObject.GetComponent<Animator>().enabled = true;
                 _linearDirection = Vector3.left;
@@ -160,16 +181,7 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    public void ActivateShields()
-    {
-        _shieldActive = true;
-        transform.GetChild(1).gameObject.SetActive(true);
-        if(_enemyType == EnemyType.Excalibur)
-        {
-            transform.GetChild(1).gameObject.transform.localScale = new Vector3(5f, 4f, 1f);
-        }
-        //ActivateComponentShields
-    }
+   
     public void EnemyDefenseSet()
     {
         switch (_enemyDefense)
@@ -194,6 +206,36 @@ public class Enemy : MonoBehaviour
             case Aggresivity.Aggresive:
                 AggresiveSet();
                 break;
+            case Aggresivity.Smart:
+                SmartSet();
+                break;
+        }
+    }
+    void EnemyAttackType()
+    {
+        switch (_enemyAttack)
+        {
+            case EnemyAttack.Laser:
+                LaserAttack();
+                break;
+            case EnemyAttack.Mine:
+                MineDeploy();
+                break;
+            case EnemyAttack.Ram:
+                RamAttack();
+                break;
+            case EnemyAttack.None:
+                //Do nothing
+                break;
+        }
+    }
+    void SmartSet()
+    {
+        transform.GetChild(3).gameObject.SetActive(true);
+        if (_enemyType == EnemyType.Excalibur)
+        {
+            transform.GetChild(3).gameObject.transform.localScale = new Vector3(3f, 3f, 1f);
+            transform.GetChild(3).gameObject.transform.rotation = Quaternion.Euler(Vector3.forward * -90);
         }
     }
     void AggresiveSet()
@@ -204,18 +246,19 @@ public class Enemy : MonoBehaviour
             transform.GetChild(2).gameObject.transform.localScale = new Vector3(3f, 3f, 1f);
         }
     }
-    // Update is called once per frame
-    void Update()
+    public void ActivateShields()
     {
-        if (_playerDetected)
+        _shieldActive = true;
+        transform.GetChild(1).gameObject.SetActive(true);
+        if (_enemyType == EnemyType.Excalibur)
         {
-           
-            _enemyAttack = EnemyAttack.Ram;
-            _enemyMovement = EnemyMovement.None;
+            transform.GetChild(1).gameObject.transform.localScale = new Vector3(5f, 4f, 1f);
         }
-        CalculateMovement();
-        EnemyAttackType();
+        //ActivateComponentShields
     }
+    // Update is called once per frame
+    #endregion 
+    #region Attacks
     void LaserAttack()
     {
         if (Time.time > _canFire)
@@ -224,6 +267,17 @@ public class Enemy : MonoBehaviour
             _canFire = Time.time + _fireRate;
             Instantiate(_laserPrefab, transform.position, Quaternion.identity);
         }
+    }
+    void FireLaserOnceUP()
+    {
+        Vector3 offsetLaser = new Vector3(0, 3.6f, 0);
+        Instantiate(_laserUp, transform.position + offsetLaser, Quaternion.identity);
+        StartCoroutine(LaserShotCooldown());
+    }
+    IEnumerator LaserShotCooldown()
+    {
+        yield return new WaitForSeconds(1f);
+        _backScannerAnim.SetBool("BackScanDetected", false);
     }
     void MineDeploy()
     {
@@ -249,14 +303,18 @@ public class Enemy : MonoBehaviour
     }
     void lockOnPlayer()
     {
+        //needs validation if player is still alive
+        if(_player != null)
+        {
+            _targetPos = _player.transform.position;
+            _myPos = transform.position;
+            _targetPos.x = _targetPos.x - _myPos.x;
+            _targetPos.y = _targetPos.y - _myPos.y;
+            angle = Mathf.Atan2(_targetPos.y, _targetPos.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle + _offsetAim));
+            StartCoroutine(LockOnWait());
+        }
         
-        _targetPos = _player.transform.position;
-        _myPos = transform.position;
-        _targetPos.x = _targetPos.x - _myPos.x;
-        _targetPos.y = _targetPos.y - _myPos.y;
-        angle = Mathf.Atan2(_targetPos.y, _targetPos.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle + _offsetAim));
-        StartCoroutine(LockOnWait());
     }
     IEnumerator LockOnWait()
     {
@@ -270,26 +328,8 @@ public class Enemy : MonoBehaviour
         _enemyMovement = EnemyMovement.linear;
         _playerDetected = false;
     }
-
-    void EnemyAttackType()
-    {
-        switch (_enemyAttack)
-        {
-            case EnemyAttack.Laser:
-                LaserAttack();
-                break;
-            case EnemyAttack.Mine:
-                MineDeploy();
-                break;
-            case EnemyAttack.Ram:
-                RamAttack();
-                break;
-            case EnemyAttack.None:
-                //Do nothing
-                break;
-        }
-    }
-
+    #endregion
+    #region Movements
     void CalculateMovement()
     {
         switch (_enemyMovement)
@@ -315,6 +355,8 @@ public class Enemy : MonoBehaviour
         // if (transform.position.y < -5f)
         if(OffBoundaries(transform.position.x,transform.position.y))
         {
+            float randomX = Random.Range(-8.0f, 8.0f);
+            transform.position = new Vector3(randomX, 7, 0);
             if (_ramAttack)
             {
                 //Debug.Log("Entre a resetear los valores");
@@ -327,8 +369,7 @@ public class Enemy : MonoBehaviour
                 //transform.GetChild(2).gameObject.transform.GetChild(0).gameObject.transform.GetComponent<CircleCollider2D>().enabled = true;
                 
             }
-            float randomX = Random.Range(-8.0f, 8.0f);
-            transform.position = new Vector3(randomX, 7, 0);
+            
            
 
         }
@@ -374,7 +415,8 @@ public class Enemy : MonoBehaviour
             transform.position = new Vector3(randomX, 7, 0);
         }
     }
-    //
+    #endregion
+    
     private void OnTriggerEnter2D(Collider2D other)
     {
         // Este debug esta super util para saber con que objeto esta colisionando
@@ -450,6 +492,7 @@ public class Enemy : MonoBehaviour
 
 
     }
+    #region publicMethods
     public void LockedOn()
     {
         transform.GetChild(0).gameObject.SetActive(true);
@@ -462,4 +505,10 @@ public class Enemy : MonoBehaviour
     {
         _playerDetected = true;
     }
+    public void BackFire()
+    {
+        _backScannerDetection = true;
+        //BackFire to player
+    }
+    #endregion
 }
