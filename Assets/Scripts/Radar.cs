@@ -33,6 +33,14 @@ public class Radar : MonoBehaviour
                     _enemy.BackFire();
                 break;
             case RadarType.FrontScanner:
+                if(other.tag == "PowerUp")
+                {
+                    _enemy.DestroyPickup();
+                }
+                if(other.tag == "Laser")
+                {
+
+                }
                 //To be implemented for the frontal actions evasion and shooting pickups
                 break;
         }

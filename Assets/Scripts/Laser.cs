@@ -68,5 +68,10 @@ public class Laser : MonoBehaviour
                 player.Damage();
             }
         }
+        if(other.tag == "PowerUp" && GameTag == gameObjectType.Enemy)
+        {
+            Destroy(other.gameObject);
+            Destroy(this.gameObject);
+        }
     }
 }

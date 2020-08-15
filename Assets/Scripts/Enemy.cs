@@ -5,7 +5,7 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     #region Variables
-    enum Aggresivity { Normal,Aggresive, Smart};
+    enum Aggresivity { Normal,Aggresive, Smart, SmartFront, SuperSmart};
     enum EnemyType {Normal, Excalibur };
     enum EnemyAttack { Laser, Mine, Ram, None};
     enum EnemyDefense { None, Shield, Dodge};
@@ -91,6 +91,9 @@ public class Enemy : MonoBehaviour
     private GameObject _laserUp;
     private Animator _backScannerAnim;
 
+    //DESTROY PICKUP
+    private bool _FireDestroyPickup=false;
+    private Animator _frontScannerAnim;
 
     #endregion
 
@@ -144,6 +147,13 @@ public class Enemy : MonoBehaviour
             _backScannerAnim.SetBool("BackScanDetected", true);
 
             FireLaserOnceUP();
+        }
+        if (_FireDestroyPickup)
+        {
+            _FireDestroyPickup = false;
+            _frontScannerAnim = transform.GetChild(4).gameObject.transform.GetChild(0).gameObject.transform.GetComponent<Animator>();
+            _frontScannerAnim.SetBool("FrontScannerDetected", true);
+            FireLaserOnceDOWN();
         }
     }
     #endregion
@@ -209,6 +219,12 @@ public class Enemy : MonoBehaviour
             case Aggresivity.Smart:
                 SmartSet();
                 break;
+            case Aggresivity.SmartFront:
+                FrontalSmartSet();
+                break;
+            case Aggresivity.SuperSmart:
+                SuperSmartSet();
+                break;
         }
     }
     void EnemyAttackType()
@@ -227,6 +243,20 @@ public class Enemy : MonoBehaviour
             case EnemyAttack.None:
                 //Do nothing
                 break;
+        }
+    }
+    void SuperSmartSet()
+    {
+        SmartSet();
+        FrontalSmartSet();
+    }
+    void FrontalSmartSet()
+    {
+        transform.GetChild(4).gameObject.SetActive(true);
+        if (_enemyType == EnemyType.Excalibur)
+        {
+            transform.GetChild(4).gameObject.transform.localScale = new Vector3(3f, 3f, 1f);
+            transform.GetChild(4).gameObject.transform.rotation = Quaternion.Euler(Vector3.forward * -90);
         }
     }
     void SmartSet()
@@ -266,7 +296,20 @@ public class Enemy : MonoBehaviour
             _fireRate = Random.Range(3f, 7f);
             _canFire = Time.time + _fireRate;
             Instantiate(_laserPrefab, transform.position, Quaternion.identity);
+            
         }
+    }
+    void FireLaserOnceDOWN()
+    {
+       
+        Instantiate(_laserPrefab, transform.position, Quaternion.identity);
+        StartCoroutine(LaserShotDownCooldown());
+
+    }
+    IEnumerator LaserShotDownCooldown()
+    {
+        yield return new WaitForSeconds(1f);
+        _frontScannerAnim.SetBool("FrontScannerDetected", false);
     }
     void FireLaserOnceUP()
     {
@@ -509,6 +552,14 @@ public class Enemy : MonoBehaviour
     {
         _backScannerDetection = true;
         //BackFire to player
+    }
+    public void DestroyPickup()
+    {
+        _FireDestroyPickup = true;
+    }
+    public void LaserIncoming()
+    {
+        //to be implemented for dodge
     }
     #endregion
 }
