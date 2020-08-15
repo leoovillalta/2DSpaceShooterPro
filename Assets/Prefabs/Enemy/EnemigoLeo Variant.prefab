@@ -25,7 +25,7 @@ PrefabInstance:
     - target: {fileID: -8790241142499210537, guid: a60838d63d369494c9ea03531e4313c6,
         type: 3}
       propertyPath: _enemyDefense
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 962009173821354668, guid: a60838d63d369494c9ea03531e4313c6,
         type: 3}
@@ -85,7 +85,7 @@ PrefabInstance:
     - target: {fileID: 3310071854763039724, guid: a60838d63d369494c9ea03531e4313c6,
         type: 3}
       propertyPath: m_Name
-      value: EnemigoLeo
+      value: EnemigoLeo Variant
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a60838d63d369494c9ea03531e4313c6, type: 3}

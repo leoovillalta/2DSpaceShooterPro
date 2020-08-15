@@ -95,6 +95,18 @@ public class Enemy : MonoBehaviour
     private bool _FireDestroyPickup=false;
     private Animator _frontScannerAnim;
 
+    //DODGE
+    private bool _dodgeCapability = false;
+    private bool _laserShotIncoming = false;
+    [SerializeField]
+    private int _dodgesLeft = 2;
+    private Vector3[] _dodgeDirection = new Vector3[2];
+    [SerializeField]
+    private float _dodgeSpeed = 4f;
+    [SerializeField]
+    private float _dodgeDuration = 1f;
+    private bool _chooseDodgeDirection = false;
+    private int _randomDodgeDirection;
     #endregion
 
     #region StartAndUpdate
@@ -170,6 +182,10 @@ public class Enemy : MonoBehaviour
                 transform.rotation = Quaternion.identity;
                 //this.gameObject.GetComponent<Animator>().enabled = true;
                 _offsetAim = 90;
+                //DODGE
+                _dodgeDirection[0] = Vector3.left;
+                _dodgeDirection[1] = Vector3.right;
+
                 break;
             case EnemyType.Excalibur:
                 //this.gameObject.GetComponent<Animator>().enabled = false;
@@ -186,6 +202,8 @@ public class Enemy : MonoBehaviour
                 _offsetAim = 180;
                 //this.gameObject.GetComponent<Animator>().enabled = true;
                 _linearDirection = Vector3.left;
+                _dodgeDirection[0] = Vector3.up;
+                _dodgeDirection[1] = Vector3.down;
                 break;
             
         }
@@ -203,6 +221,8 @@ public class Enemy : MonoBehaviour
                 ActivateShields();
                 break;
             case EnemyDefense.Dodge:
+                _dodgeCapability = true;
+                FrontalSmartSet();
                 break;
         }
     }
@@ -375,6 +395,12 @@ public class Enemy : MonoBehaviour
     #region Movements
     void CalculateMovement()
     {
+        if (_dodgeCapability && _laserShotIncoming)
+        {
+            _frontScannerAnim = transform.GetChild(4).gameObject.transform.GetChild(0).gameObject.transform.GetComponent<Animator>();
+            _frontScannerAnim.SetBool("FrontScannerDetected", true);
+            DodgeLaser();
+        }
         switch (_enemyMovement)
         {
             case EnemyMovement.linear:
@@ -390,6 +416,24 @@ public class Enemy : MonoBehaviour
                 //Let The Ram attack do all the work
                 break;
         }
+    }
+    void DodgeLaser()
+    {
+        if (!_chooseDodgeDirection)
+        {
+            
+            _randomDodgeDirection = Random.Range(0, 2);
+            _chooseDodgeDirection = true;
+        }
+        transform.Translate(_dodgeDirection[_randomDodgeDirection] * _dodgeSpeed * Time.deltaTime);
+        StartCoroutine(DodgeTime());
+    }
+    IEnumerator DodgeTime()
+    {
+        yield return new WaitForSeconds(_dodgeDuration);
+        _laserShotIncoming = false;
+        _frontScannerAnim.SetBool("FrontScannerDetected", false);
+        _chooseDodgeDirection = false;
     }
     void linearMovement()
     {
@@ -560,6 +604,7 @@ public class Enemy : MonoBehaviour
     public void LaserIncoming()
     {
         //to be implemented for dodge
+        _laserShotIncoming = true;
     }
     #endregion
 }

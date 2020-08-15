@@ -39,7 +39,8 @@ public class Radar : MonoBehaviour
                 }
                 if(other.tag == "Laser")
                 {
-
+                    _enemy.LaserIncoming();
+                    //To be implemented for dodge
                 }
                 //To be implemented for the frontal actions evasion and shooting pickups
                 break;
