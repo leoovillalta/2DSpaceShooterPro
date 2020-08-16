@@ -11,10 +11,23 @@ public class PowerUp : MonoBehaviour
     private float _speed = 3.0f;
     [SerializeField]
     private AudioClip _clip=default;
+
+    
+
+    //MOVE TO PLAYER
+    private bool _playerMagnetOn = false;
+    private GameObject _player;
+    private float _speedToPlayer=8f;
+    private Vector2 _targetV2pos;
+
     // Start is called before the first frame update
     void Start()
     {
-       
+        _player = GameObject.Find("Player");
+        if (_player == null)
+        {
+            Debug.LogError("Player is null");
+        }
     }
 
     // Update is called once per frame
@@ -25,6 +38,20 @@ public class PowerUp : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
+        MoveToPlayerLocation();
+    }
+    
+    void MoveToPlayerLocation()
+    {
+        if (_playerMagnetOn)
+        {
+            //Debug.Log("Estoy dentro del PowerUp Magnet");
+            float step = _speedToPlayer * Time.deltaTime;
+            _targetV2pos = new Vector2(_player.transform.position.x, _player.transform.position.y);
+            // move sprite towards the target location
+            transform.position = Vector2.MoveTowards(transform.position, _targetV2pos, step);
+        }
+        
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -66,5 +93,13 @@ public class PowerUp : MonoBehaviour
             }
             Destroy(this.gameObject);
         }
+    }
+    public void PlayerMagnetOn()
+    {
+        _playerMagnetOn = true;
+    }
+    public void PlayerMagnetOff()
+    {
+        _playerMagnetOn = false;
     }
 }

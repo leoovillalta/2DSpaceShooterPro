@@ -94,6 +94,10 @@ public class Player : MonoBehaviour
     //CAMERA SHAKE
     private CameraShake _cameraShake;
 
+    //Power up 
+    [SerializeField]
+    private GameObject _closePowerUp;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -203,6 +207,53 @@ public class Player : MonoBehaviour
             FireLaser();
         }
         ThrusterUp();
+        MagnetPowerUp();
+    }
+
+    void MagnetPowerUp()
+    {
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+           // Debug.Log("Active el iman");
+            //find power up
+            // Activate Magnet
+            // pull 
+            
+            _closePowerUp = FindClosestPowerUp();
+            if(_closePowerUp!= null)
+            {
+                _closePowerUp.GetComponent<PowerUp>().PlayerMagnetOn();
+            }
+            
+
+        }
+        else if (Input.GetKeyUp(KeyCode.C))
+        {
+            if(_closePowerUp != null)
+            {
+                _closePowerUp.GetComponent<PowerUp>().PlayerMagnetOff();
+            }
+            
+        }
+    }
+    public GameObject FindClosestPowerUp()
+    {
+        GameObject[] gos;
+        gos = GameObject.FindGameObjectsWithTag("PowerUp");
+        GameObject closest = null;
+        float distance = Mathf.Infinity;
+        Vector3 position = transform.position;
+        foreach (GameObject go in gos)
+        {
+            Vector3 diff = go.transform.position - position;
+            float curDistance = diff.sqrMagnitude;
+            if (curDistance < distance)
+            {
+                closest = go;
+                distance = curDistance;
+            }
+        }
+        return closest;
     }
 
     void FireLaser()
