@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Missile : MonoBehaviour
 {
-    enum FiredBy { Player, Enemy};
+    public enum FiredBy { Player, Enemy};
     [SerializeField]
     FiredBy firedBy = FiredBy.Player;
     [SerializeField]
@@ -21,13 +21,33 @@ public class Missile : MonoBehaviour
     private bool _lockedOn = false;
     private bool _deployed = false;
     private float _deploySpeed = 6f;
+
+    //Reference player
+
+    private Player _player;
+
+    //Self destruct
+    private bool _selfDestructInitiated = false;
     //private Vector2 _myPositionV2;
     // Start is called before the first frame update
     void Start()
     {
+        _player = GameObject.Find("Player").GetComponent<Player>();
         transform.GetChild(0).gameObject.SetActive(false);
+        SetMissileSpeed();
     }
-
+    void SetMissileSpeed()
+    {
+        switch (firedBy)
+        {
+            case FiredBy.Player:
+                _missileSpeed = 5.0f;
+                break;
+            case FiredBy.Enemy:
+                _missileSpeed = 4.0f;
+                break;
+        }
+    }
     // Update is called once per frame
     void Update()
     {
@@ -42,9 +62,15 @@ public class Missile : MonoBehaviour
             StartCoroutine(DeployCountDown());
         }
         
-       
+       if(firedBy == FiredBy.Enemy && !_selfDestructInitiated)
+        {
+            _selfDestructInitiated = true;
+            //Later use a corroutine to spawn an explosion
+            Destroy(this.gameObject, 6f);
+        }
         
     }
+    
     IEnumerator DeployCountDown()
     {
         yield return new WaitForSeconds(1f);
@@ -94,7 +120,16 @@ public class Missile : MonoBehaviour
     }
     public void SearchAndLockOn()
     {
-        _target = FindClosestEnemy();
+        switch (firedBy)
+        {
+            case FiredBy.Player:
+                _target = FindClosestEnemy();
+                break;
+            case FiredBy.Enemy:
+                _target = _player.transform.gameObject;
+                break;
+        }
+        
         if(_target == null)
         {
             //Debug.Log("There are no enemies");
@@ -102,8 +137,28 @@ public class Missile : MonoBehaviour
         }
         else
         {
-            _lockedOn = true;
-            _target.gameObject.GetComponent<Enemy>().LockedOn();
+            //_lockedOn = true;
+            if(_target.gameObject.GetComponent<Player>() != null)
+            {
+                _lockedOn = true;
+                _target.gameObject.GetComponent<Player>().LockedOn();
+                
+            }
+            else if(_target.gameObject.GetComponent<Enemy>() != null)
+            {
+                _lockedOn = true;
+                _target.gameObject.GetComponent<Enemy>().LockedOn();
+            }
+            else if(_target.gameObject.GetComponent<Turret>() != null)
+            {
+                if (_target.gameObject.GetComponent<Turret>().GetCanBeTargeted())
+                {
+                    _lockedOn = true;
+                    _target.gameObject.GetComponent<Turret>().LockedOn();
+                }
+                
+            }
+            
         }
     }
 
@@ -125,5 +180,9 @@ public class Missile : MonoBehaviour
             }
         }
         return closest;
+    }
+    public FiredBy GetFiredBy()
+    {
+        return firedBy;
     }
 }

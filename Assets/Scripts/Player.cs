@@ -102,7 +102,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         //Transform to position 0,0,0
-        transform.position = new Vector3(0, 0, 0);
+        transform.position = new Vector3(0, -2, 0);
         _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
         _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
         _audioSource = GetComponent<AudioSource>();
@@ -423,6 +423,7 @@ public class Player : MonoBehaviour
 
     public void Damage()
     {
+        transform.GetChild(4).gameObject.SetActive(false);
         _cameraShake.ShakeCameraNormalHit();
         if (_isShieldBoostActive == true)
         {
@@ -444,6 +445,10 @@ public class Player : MonoBehaviour
         else
         {
             _lives -= 1;
+            if (_lives < 0)
+            {
+                _lives = 0;
+            }
             _livesDecreased = true;
             livesStatus();
             //if(_lives == 2)
@@ -505,8 +510,12 @@ public class Player : MonoBehaviour
         
     }
 
+    public void LockedOn()
+    {
+        transform.GetChild(4).gameObject.SetActive(true);
 
-   
+    }
 
-   
+
+
 }

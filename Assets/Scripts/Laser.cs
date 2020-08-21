@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Laser : MonoBehaviour
 {
-    enum gameObjectType {Player,Enemy,EnemyBackFire};
+    public enum gameObjectType { Player, Enemy, EnemyBackFire , Boss };
     [SerializeField]
     gameObjectType GameTag = gameObjectType.Player;
     [SerializeField]
@@ -12,13 +12,13 @@ public class Laser : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(GameTag == gameObjectType.Player || GameTag == gameObjectType.EnemyBackFire)
+        if (GameTag == gameObjectType.Player || GameTag == gameObjectType.EnemyBackFire)
         {
             MoveUp();
         }
@@ -26,9 +26,13 @@ public class Laser : MonoBehaviour
         {
             MoveDown();
         }
-        
-    }
+        else if(GameTag == gameObjectType.Boss)
+        {
+            BossFire();
+        }
 
+    }
+    
     void MoveUp()
     {
         transform.Translate(Vector3.up * _laserspeed * Time.deltaTime);
@@ -57,10 +61,24 @@ public class Laser : MonoBehaviour
         }
 
     }
+    void BossFire()
+    {
+        //Shoot Laser with Turret Direction
+        transform.Translate(Vector3.up * _laserspeed * Time.deltaTime);
 
+        if (OffBoundaries(transform.position.x,transform.position.y))
+        {            
+            Destroy(this.gameObject);
+        }
+    }
+    bool OffBoundaries(float x, float y)
+    {
+        if (y < -5f || y > 10f || x < -12f || x > 12f) return true;
+        return false;
+    }
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if(other.tag == "Player" && (GameTag == gameObjectType.Enemy || GameTag == gameObjectType.EnemyBackFire))
+        if(other.tag == "Player" && (GameTag == gameObjectType.Enemy || GameTag == gameObjectType.EnemyBackFire || GameTag == gameObjectType.Boss))
         {
             Player player = other.GetComponent<Player>();
             if(player != null)
@@ -73,5 +91,10 @@ public class Laser : MonoBehaviour
             Destroy(other.gameObject);
             Destroy(this.gameObject);
         }
+    }
+
+    public gameObjectType GetGameObjectType()
+    {
+        return GameTag;
     }
 }
