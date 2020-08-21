@@ -59,6 +59,11 @@ public class Turret : MonoBehaviour
     [SerializeField]
     private Boss _boss;
 
+    [SerializeField]
+    private bool _shieldsOn = false;
+    [SerializeField]
+    private float _offsetYShot = 0;
+    private float _offsetXShot = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -66,6 +71,8 @@ public class Turret : MonoBehaviour
         _player = GameObject.Find("Player").GetComponent<Player>();
         _originalShotsToBeFired = _shotsToBeFired;
         SetTurretPosition();
+        //Method to disable colliders
+        //Method to activate them
     }
     void SetTurretPosition()
     {
@@ -74,12 +81,20 @@ public class Turret : MonoBehaviour
             case TurretPosition.Right:
                 _offsetAim = 270;
                 _offsetShot = _offsetAim;
+                _offsetYShot = 3.6f;
+                _offsetXShot = 0;
                 break;
             case TurretPosition.Left:
                 _offsetAim = 270;
                 _offsetShot = _offsetAim;
+                _offsetYShot = 3.6f;
+                _offsetXShot = 0;
                 break;
             case TurretPosition.Center:
+                _offsetAim = 0;
+                _offsetShot = _offsetAim-90;
+                _offsetYShot = 0;
+                _offsetXShot = 1f;
                 break;
         }
     }
@@ -102,6 +117,7 @@ public class Turret : MonoBehaviour
                 }
 
             }
+            
         }
     }
       
@@ -150,8 +166,8 @@ public class Turret : MonoBehaviour
 
         GameObject lasershot = Instantiate(_laserDownPrefab, transform.position, Quaternion.identity, this.transform);
         // lasershot.transform.position.y = transform.position.y + 3.6f;
-        lasershot.transform.localPosition = new Vector3(0, 3.6f, 0);
-        lasershot.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle + _offsetAim));
+        lasershot.transform.localPosition = new Vector3(_offsetXShot, _offsetYShot, 0);
+        lasershot.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle + _offsetShot));
         //lasershot.transform.parent = this.transform;
         _shotsToBeFired--;
         //StartCoroutine(WaitBetweenShots());
@@ -181,7 +197,15 @@ public class Turret : MonoBehaviour
             }
             //Debug.Log("The Player has hit me");
             Destroy(other.gameObject);
-            _health--;
+            if (_shieldsOn)
+            {
+
+            }
+            else
+            {
+                _health--;
+            }
+            
             healthStatus();
             StartCoroutine(PaintDamage());
         }
@@ -211,6 +235,7 @@ public class Turret : MonoBehaviour
                 _boss.ReportDestroyed(1);
                 break;
             case TurretPosition.Center:
+                _boss.ReportDestroyed(0);
                 break;
         }
         
@@ -247,7 +272,26 @@ public class Turret : MonoBehaviour
         }
         
     }
-    
+    void TurnOnShields()
+    {
+        transform.GetChild(2).gameObject.SetActive(true);
+    }
+    void TurnOffShields()
+    {
+        transform.GetChild(2).gameObject.SetActive(false);
+    }
+    public void Shields(bool status)
+    {
+        _shieldsOn = status;
+        if (status)
+        {
+            TurnOnShields();
+        }
+        else
+        {
+            TurnOffShields();
+        }
+    }
     public void BossEnableTurret()
     {
         _disabledTurret = false;

@@ -2825,6 +2825,7 @@ GameObject:
   - component: {fileID: 652928674}
   - component: {fileID: 652928675}
   - component: {fileID: 652928677}
+  - component: {fileID: 652928678}
   - component: {fileID: 652928676}
   m_Layer: 0
   m_Name: CentralCannon
@@ -2947,6 +2948,35 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.8, y: 0.114669845}
   m_EdgeRadius: 0
+--- !u!114 &652928678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 652928673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d96d3369882186140a5f3ed2273ae4d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _health: 5
+  _turretPosition: 2
+  _rammingSpeed: 6
+  _offsetAim: 270
+  _laserDownPrefab: {fileID: 7187421828024084796, guid: 3b1d0f3592e16f14ea2bf38332a38bf4,
+    type: 3}
+  _shotsToBeFired: 1
+  _smallExplosionPrefab: {fileID: 8396548090508040336, guid: 520c459fce0eb844ba92daea0ad13ec6,
+    type: 3}
+  _CanBeTargeted: 0
+  _aimingTime: 2
+  _shotsRate: 0.15
+  _turretCoolDownTime: 1
+  _disabledTurret: 1
+  _boss: {fileID: 0}
+  _shieldsOn: 0
+  _offsetYShot: 0
 --- !u!1001 &744970677
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3498,12 +3528,12 @@ PrefabInstance:
     - target: {fileID: 2434822922390480492, guid: 3bca57bd9cefd9a4692879b1fd2c003e,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 7.33
+      value: -0.091
       objectReference: {fileID: 0}
     - target: {fileID: 2434822922390480492, guid: 3bca57bd9cefd9a4692879b1fd2c003e,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.6
+      value: 5.441
       objectReference: {fileID: 0}
     - target: {fileID: 2434822922390480492, guid: 3bca57bd9cefd9a4692879b1fd2c003e,
         type: 3}
@@ -3523,17 +3553,17 @@ PrefabInstance:
     - target: {fileID: 2434822922390480492, guid: 3bca57bd9cefd9a4692879b1fd2c003e,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 2434822922390480492, guid: 3bca57bd9cefd9a4692879b1fd2c003e,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 2434822922390480492, guid: 3bca57bd9cefd9a4692879b1fd2c003e,
         type: 3}
       propertyPath: m_RootOrder
-      value: 20
+      value: 21
       objectReference: {fileID: 0}
     - target: {fileID: 2434822922390480492, guid: 3bca57bd9cefd9a4692879b1fd2c003e,
         type: 3}
@@ -3548,7 +3578,7 @@ PrefabInstance:
     - target: {fileID: 2434822922390480492, guid: 3bca57bd9cefd9a4692879b1fd2c003e,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
+      value: 90
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3bca57bd9cefd9a4692879b1fd2c003e, type: 3}
@@ -4345,6 +4375,8 @@ MonoBehaviour:
   _turretCoolDownTime: 1
   _disabledTurret: 1
   _boss: {fileID: 0}
+  _shieldsOn: 0
+  _offsetYShot: 0
 --- !u!1 &1015574662
 GameObject:
   m_ObjectHideFlags: 0
@@ -5772,6 +5804,8 @@ MonoBehaviour:
   _turretCoolDownTime: 2
   _disabledTurret: 1
   _boss: {fileID: 0}
+  _shieldsOn: 0
+  _offsetYShot: 0
 --- !u!4 &1388123973 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5210018319760818023, guid: 941ce97b2ae160242908547767a39be4,
@@ -8060,6 +8094,90 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2134745537}
   m_CullTransparentMesh: 0
+--- !u!1001 &385205287829206451
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5601279886900288823, guid: 3b1d0f3592e16f14ea2bf38332a38bf4,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.02999962
+      objectReference: {fileID: 0}
+    - target: {fileID: 5601279886900288823, guid: 3b1d0f3592e16f14ea2bf38332a38bf4,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 4.6300006
+      objectReference: {fileID: 0}
+    - target: {fileID: 5601279886900288823, guid: 3b1d0f3592e16f14ea2bf38332a38bf4,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5601279886900288823, guid: 3b1d0f3592e16f14ea2bf38332a38bf4,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5601279886900288823, guid: 3b1d0f3592e16f14ea2bf38332a38bf4,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5601279886900288823, guid: 3b1d0f3592e16f14ea2bf38332a38bf4,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5601279886900288823, guid: 3b1d0f3592e16f14ea2bf38332a38bf4,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5601279886900288823, guid: 3b1d0f3592e16f14ea2bf38332a38bf4,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 5601279886900288823, guid: 3b1d0f3592e16f14ea2bf38332a38bf4,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5601279886900288823, guid: 3b1d0f3592e16f14ea2bf38332a38bf4,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5601279886900288823, guid: 3b1d0f3592e16f14ea2bf38332a38bf4,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5601279886900288823, guid: 3b1d0f3592e16f14ea2bf38332a38bf4,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.6000004
+      objectReference: {fileID: 0}
+    - target: {fileID: 5601279886900288823, guid: 3b1d0f3592e16f14ea2bf38332a38bf4,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.45000023
+      objectReference: {fileID: 0}
+    - target: {fileID: 7187421828024084796, guid: 3b1d0f3592e16f14ea2bf38332a38bf4,
+        type: 3}
+      propertyPath: m_Name
+      value: CenterCannonLaser
+      objectReference: {fileID: 0}
+    - target: {fileID: 7187421828024084796, guid: 3b1d0f3592e16f14ea2bf38332a38bf4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3b1d0f3592e16f14ea2bf38332a38bf4, type: 3}
 --- !u!1001 &2655940758443495395
 PrefabInstance:
   m_ObjectHideFlags: 0

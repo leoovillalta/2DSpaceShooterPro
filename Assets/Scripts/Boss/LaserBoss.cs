@@ -161,6 +161,7 @@ public class LaserBoss : MonoBehaviour
         //Report to Boss
         if (_health <= 0)
         {
+            _boss.ReportFirstLaserDown();
             //Disable Turret
             //Disable Collider
             //Enable DamageChild

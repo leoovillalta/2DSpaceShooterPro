@@ -32,6 +32,9 @@ public class Boss : MonoBehaviour
 
     //Animators
     private Animator _bossAnim;
+
+    private bool _firstLaserDown = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -48,6 +51,7 @@ public class Boss : MonoBehaviour
         _leftTurret = transform.Find("LeftTurret").gameObject;
         _rightLaser = transform.Find("RightLaser").gameObject;
         _leftLaser = transform.Find("LeftLaser").gameObject;
+        _centerTurret = transform.Find("CentralCannon").gameObject;
     }
     void SetDisableAllWeapons()
     {
@@ -55,6 +59,7 @@ public class Boss : MonoBehaviour
         _leftTurret.GetComponent<Turret>().BossDisableTurret();
         _rightLaser.GetComponent<LaserBoss>().BossDisableLasers();
         _leftLaser.GetComponent<LaserBoss>().BossDisableLasers();
+        _centerTurret.GetComponent<Turret>().BossDisableTurret();
     }
     IEnumerator StartBossFightTimer()
     {
@@ -78,6 +83,12 @@ public class Boss : MonoBehaviour
             _bossPhaseStarted = false;
             Array.Resize(ref _conditionsForEndPhase, 1);
             _conditionsForEndPhase[0] = false;
+        }
+        if(bossPhase==2 && _firstLaserDown)
+        {
+            //Send Activation for Central Cannon With Shields
+            _centerTurret.GetComponent<Turret>().BossEnableTurret();
+            _centerTurret.GetComponent<Turret>().Shields(true);
         }
     }
 
@@ -105,6 +116,11 @@ public class Boss : MonoBehaviour
                 //Lasers Can be targeted
                 break;
             case 3:
+                _bossAnim.SetTrigger("HideLasers");
+                Array.Resize(ref _conditionsForEndPhase, 1);
+                _centerTurret.GetComponent<Turret>().Shields(false);
+                _conditionsForEndPhase[0] = false;
+                //Central Turret Shields Down
                 //Central Cannon + Missiles
                 break;
             case 4:
@@ -142,5 +158,9 @@ public class Boss : MonoBehaviour
             }
         }
         return _allConditionsCompleted;
+    }
+    public void ReportFirstLaserDown()
+    {
+        _firstLaserDown = true;
     }
 }
