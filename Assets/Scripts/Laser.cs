@@ -78,7 +78,7 @@ public class Laser : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if(other.tag == "Player" && (GameTag == gameObjectType.Enemy || GameTag == gameObjectType.EnemyBackFire || GameTag == gameObjectType.Boss))
+        if(other.tag == "Player" && ShotByEnemyInGeneral())
         {
             Player player = other.GetComponent<Player>();
             if(player != null)
@@ -92,7 +92,19 @@ public class Laser : MonoBehaviour
             Destroy(this.gameObject);
         }
     }
-
+    public bool ShotByEnemyInGeneral()
+    {
+        if(GameTag == gameObjectType.Enemy || 
+           GameTag == gameObjectType.EnemyBackFire || 
+           GameTag == gameObjectType.Boss)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
     public gameObjectType GetGameObjectType()
     {
         return GameTag;

@@ -98,10 +98,17 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _closePowerUp;
 
+    //DODGE
+    private Animator _anim;
+    private bool _dodging = false;
+    [SerializeField]
+    private float _dodgingTime=2f;
+
     // Start is called before the first frame update
     void Start()
     {
         //Transform to position 0,0,0
+        _anim = transform.GetComponent<Animator>();
         transform.position = new Vector3(0, -2, 0);
         _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
         _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
@@ -208,8 +215,38 @@ public class Player : MonoBehaviour
         }
         ThrusterUp();
         MagnetPowerUp();
+        EvasiveManeuver();
     }
 
+    void EvasiveManeuver()
+    {
+        if (Input.GetKeyDown(KeyCode.X) && !_dodging)
+        {
+            //_dodging = true;
+            //Disable Collider
+            Debug.Log("Entre a hacer la maniobra evasiva");
+           // transform.GetComponent<BoxCollider2D>().enabled = false;
+            //StartCoroutine(dodgingCoolDown());
+            
+            if(Input.GetAxis("Horizontal") < 0)
+            {
+                //Left
+                _anim.SetTrigger("EvasiveManeuverLeft");
+            }
+            else
+            {
+                //right
+                _anim.SetTrigger("EvasiveManeuverRight");
+            }
+        }
+    }
+    IEnumerator dodgingCoolDown()
+    {
+        
+        yield return new WaitForSeconds(_dodgingTime);
+        //transform.GetComponent<BoxCollider2D>().enabled = true;
+        _dodging = false;
+    }
     void MagnetPowerUp()
     {
         if (Input.GetKeyDown(KeyCode.C))

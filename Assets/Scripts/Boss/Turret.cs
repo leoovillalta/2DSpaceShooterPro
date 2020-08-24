@@ -64,9 +64,23 @@ public class Turret : MonoBehaviour
     [SerializeField]
     private float _offsetYShot = 0;
     private float _offsetXShot = 0;
+
+    //FLASH Before Shot
+    private GameObject _flashBeforeShot;
+    [SerializeField]
+    private float _flashWaitSeconds = 0.15f;
+    [SerializeField]
+    private float _flashTurnOff = 1f;
+
+    //Aiming Sound
+    private AudioSource _audioTurret;
+    [SerializeField]
+    private AudioClip[] _audioClips;
     // Start is called before the first frame update
     void Start()
     {
+        _audioTurret = transform.GetComponent<AudioSource>();
+        _flashBeforeShot = transform.Find("FlashBeforeShot").gameObject;
         _boss = transform.parent.gameObject.GetComponent<Boss>();
         _player = GameObject.Find("Player").GetComponent<Player>();
         _originalShotsToBeFired = _shotsToBeFired;
@@ -135,6 +149,9 @@ public class Turret : MonoBehaviour
             //Send Laser direction
             if (!_startedCountDownForFiring)
             {
+                _audioTurret.Stop();
+                _audioTurret.clip = _audioClips[0];//targeting
+                _audioTurret.Play();
                 _startedCountDownForFiring = true;
                 StartCoroutine(LockOnWait());
             }
@@ -146,11 +163,16 @@ public class Turret : MonoBehaviour
     {
         Debug.Log("Estoy apuntando en 2 segundos dejo de apuntar");
         yield return new WaitForSeconds(_aimingTime);
+        _audioTurret.Stop();
+        _audioTurret.clip = _audioClips[1];
         _firing = true;
         _turretCoolDown = true;
-        yield return null;
+        _flashBeforeShot.SetActive(true);
+        yield return new WaitForSeconds(_flashWaitSeconds);
+        StartCoroutine(FlashTurnOff());
         while (_firing && !_disabledTurret)
         {
+            _audioTurret.Play();
             Debug.Log("Estoy Disparando");
             Fire();
             yield return new WaitForSeconds(_shotsRate);
@@ -175,8 +197,16 @@ public class Turret : MonoBehaviour
 
         Debug.Log("Shots to be fired: " + _shotsToBeFired);
     }
-
+    IEnumerator FlashTurnOff()
+    {
+        yield return new WaitForSeconds(_flashTurnOff);
+        _flashBeforeShot.SetActive(false);
+    }
+    
     IEnumerator TurretCoolDownTimer() {
+        _audioTurret.Stop();
+        _audioTurret.clip = _audioClips[2];
+        _audioTurret.Play();
         yield return new WaitForSeconds(_turretCoolDownTime);
 
         _turretCoolDown = false;
