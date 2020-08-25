@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TwoDLaserPack;
+using System.Linq;
 
 public class Player : MonoBehaviour
 {
@@ -104,10 +106,20 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float _dodgingTime=2f;
 
+    //LASERS DAMAGE
+    [SerializeField]
+    private LineBasedLaser[] allLasersInScene;
+
+    //LASERS STOP FIRING AFTER DEATH
+    //Stop missiles after death
+    private MissileSpawner _missileSpawner;
+
     // Start is called before the first frame update
     void Start()
     {
+
         //Transform to position 0,0,0
+        _missileSpawner = GameObject.Find("MissileSpawner").GetComponent<MissileSpawner>();
         _anim = transform.GetComponent<Animator>();
         transform.position = new Vector3(0, -2, 0);
         _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
@@ -122,6 +134,10 @@ public class Player : MonoBehaviour
 
         //LIVES
         _initialLives = _lives;
+
+        //BOSS LASERS
+        LasersToBeShot();
+
 
         if(_spawnManager == null)
         {
@@ -516,6 +532,12 @@ public class Player : MonoBehaviour
         {
             case 0:
                 _spawnManager.OnPlayerDeath();
+                _missileSpawner.OnPlayerDeath();
+                foreach (var lineBasedLaser in allLasersInScene)
+                {
+                    lineBasedLaser.OnLaserHitTriggered -= LaserOnOnLaserHitTriggered;
+                    //lineBasedLaser.SetLaserState(false);
+                }
                 Destroy(this.gameObject,0.1f);
                 break;
             case 1:
@@ -539,6 +561,35 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void LaserOnOnLaserHitTriggered(RaycastHit2D hitInfo)
+    {
+        if(this.gameObject != null)
+        {
+            if (hitInfo.collider.gameObject == gameObject)
+            {
+                Debug.Log("Receiving damage from Lasers");
+                Damage();
+            }
+        }
+        
+    }
+
+    void LasersToBeShot()
+    {
+        allLasersInScene = GameObject.FindObjectsOfType<LineBasedLaser>();
+        //restartButton.onClick.RemoveAllListeners();
+        //restartButton.onClick.AddListener(OnRestartButtonClick);
+
+        if (allLasersInScene.Any())
+        {
+            foreach (var laser in allLasersInScene)
+            {
+                laser.OnLaserHitTriggered += LaserOnOnLaserHitTriggered;
+                //laser.SetLaserState(true);
+                //laser.targetGo = gameObject;
+            }
+        }
+    }
     //Method add 10 to Score
     //Communicate to UI to Update Score
     public void AddScore(int points) {

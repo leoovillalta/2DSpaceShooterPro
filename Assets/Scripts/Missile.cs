@@ -28,11 +28,19 @@ public class Missile : MonoBehaviour
 
     //Self destruct
     private bool _selfDestructInitiated = false;
+
+    //explosion
+    [SerializeField]
+    private GameObject _smallExplosionPrefab;
+
+
     //private Vector2 _myPositionV2;
     // Start is called before the first frame update
     void Start()
     {
+        
         _player = GameObject.Find("Player").GetComponent<Player>();
+
         transform.GetChild(0).gameObject.SetActive(false);
         SetMissileSpeed();
     }
@@ -66,9 +74,23 @@ public class Missile : MonoBehaviour
         {
             _selfDestructInitiated = true;
             //Later use a corroutine to spawn an explosion
-            Destroy(this.gameObject, 6f);
+            //Destroy(this.gameObject, 6f);
+            StartCoroutine(SelfDestructTimer());
         }
         
+    }
+    IEnumerator SelfDestructTimer()
+    {
+        //What to do before
+        yield return new WaitForSeconds(6f);
+        explosion();
+        Destroy(this.gameObject);
+    }
+
+    public void explosion()
+    {
+        GameObject newExplosion = Instantiate(_smallExplosionPrefab, transform.position, Quaternion.identity);
+        Destroy(newExplosion, 2.5f);
     }
     
     IEnumerator DeployCountDown()
@@ -126,7 +148,11 @@ public class Missile : MonoBehaviour
                 _target = FindClosestEnemy();
                 break;
             case FiredBy.Enemy:
-                _target = _player.transform.gameObject;
+                if (_player != null)
+                {
+                    _target = _player.transform.gameObject;
+                }
+                
                 break;
         }
         
@@ -181,6 +207,23 @@ public class Missile : MonoBehaviour
         }
         return closest;
     }
+
+    //HIT PLAYER
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if(other.tag == "Player" && firedBy == FiredBy.Enemy)
+        {
+            if (_player != null)
+            {
+                _player.Damage();
+                explosion();
+                Destroy(this.gameObject, 2.5f);
+            }
+
+        }
+    }
+
+
     public FiredBy GetFiredBy()
     {
         return firedBy;

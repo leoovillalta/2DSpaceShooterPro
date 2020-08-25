@@ -15,6 +15,8 @@ public class MissileSpawner : MonoBehaviour
     [SerializeField]
     private float _waitBetweenMissiles = 3.0f;
     private bool _endOfPhase = false;
+
+    private bool _stopSpawning = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -24,9 +26,9 @@ public class MissileSpawner : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (_missilesActive)
+        if (_missilesActive && !_stopSpawning)
         {
-            if (!_shootingMissile && !_endOfPhase)
+            if (!_shootingMissile && !_endOfPhase && !_stopSpawning)
             {
                 _shootingMissile = true;
                 shotMissiles();
@@ -46,7 +48,7 @@ public class MissileSpawner : MonoBehaviour
     }
     void MissileDeploy(bool right)
     {
-        if (right)
+        if (right && !_stopSpawning)
         {
             //Instatiate to the right
             GameObject missileshot = Instantiate(_missilePrefab, transform.position, Quaternion.identity, this.transform);
@@ -82,5 +84,10 @@ public class MissileSpawner : MonoBehaviour
     public void RechargeMissiles(int missilesRecharged)
     {
         _missilesToBeShot = missilesRecharged;
+    }
+    public void OnPlayerDeath()
+    {
+        //Debug.Log("PlayerDead");
+        _stopSpawning = true;
     }
 }

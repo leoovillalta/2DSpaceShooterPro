@@ -156,6 +156,8 @@ MonoBehaviour:
   firedBy: 0
   _missileSpeed: 5
   _offsetAim: -90
+  _smallExplosionPrefab: {fileID: 8396548090508040336, guid: 520c459fce0eb844ba92daea0ad13ec6,
+    type: 3}
 --- !u!1 &2433512978906595567
 GameObject:
   m_ObjectHideFlags: 0

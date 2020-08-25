@@ -22,6 +22,17 @@ PrefabInstance:
       propertyPath: firedBy
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2433512978126353224, guid: 3bca57bd9cefd9a4692879b1fd2c003e,
+        type: 3}
+      propertyPath: _smallExplosionPrefab
+      value: 
+      objectReference: {fileID: 8396548090508040336, guid: 520c459fce0eb844ba92daea0ad13ec6,
+        type: 3}
+    - target: {fileID: 2433512978126353224, guid: 3bca57bd9cefd9a4692879b1fd2c003e,
+        type: 3}
+      propertyPath: _missileSpeed
+      value: 4.5
+      objectReference: {fileID: 0}
     - target: {fileID: 2434822922390480492, guid: 3bca57bd9cefd9a4692879b1fd2c003e,
         type: 3}
       propertyPath: m_LocalPosition.x

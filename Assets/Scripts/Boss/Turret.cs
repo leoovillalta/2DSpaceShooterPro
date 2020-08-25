@@ -76,6 +76,10 @@ public class Turret : MonoBehaviour
     private AudioSource _audioTurret;
     [SerializeField]
     private AudioClip[] _audioClips;
+    //0 aiming
+    //1 Shooting
+    //2 Cooldown
+
     // Start is called before the first frame update
     void Start()
     {
@@ -85,8 +89,11 @@ public class Turret : MonoBehaviour
         _player = GameObject.Find("Player").GetComponent<Player>();
         _originalShotsToBeFired = _shotsToBeFired;
         SetTurretPosition();
+
+
         //Method to disable colliders
         //Method to activate them
+        transform.GetComponent<BoxCollider2D>().enabled = false;
     }
     void SetTurretPosition()
     {
@@ -161,7 +168,7 @@ public class Turret : MonoBehaviour
     }
     IEnumerator LockOnWait()
     {
-        Debug.Log("Estoy apuntando en 2 segundos dejo de apuntar");
+        //Debug.Log("Estoy apuntando en 2 segundos dejo de apuntar");
         yield return new WaitForSeconds(_aimingTime);
         _audioTurret.Stop();
         _audioTurret.clip = _audioClips[1];
@@ -173,7 +180,7 @@ public class Turret : MonoBehaviour
         while (_firing && !_disabledTurret)
         {
             _audioTurret.Play();
-            Debug.Log("Estoy Disparando");
+           // Debug.Log("Estoy Disparando");
             Fire();
             yield return new WaitForSeconds(_shotsRate);
                      
@@ -195,7 +202,7 @@ public class Turret : MonoBehaviour
         //StartCoroutine(WaitBetweenShots());
         //yield return new WaitForSeconds(5f);
 
-        Debug.Log("Shots to be fired: " + _shotsToBeFired);
+        //Debug.Log("Shots to be fired: " + _shotsToBeFired);
     }
     IEnumerator FlashTurnOff()
     {
@@ -324,11 +331,13 @@ public class Turret : MonoBehaviour
     }
     public void BossEnableTurret()
     {
+        transform.GetComponent<BoxCollider2D>().enabled = true;
         _disabledTurret = false;
     }
     public void BossDisableTurret()
     {
         _disabledTurret = true;
+        transform.GetComponent<BoxCollider2D>().enabled = false;
     }
     public void LockedOn()
     {

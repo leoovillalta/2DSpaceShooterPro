@@ -149,7 +149,7 @@ public class Boss : MonoBehaviour
     //Attacks
     IEnumerator WaitForLasersDeploy()
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(1f);
         _rightLaser.GetComponent<LaserBoss>().BossEnableLasers();
         _leftLaser.GetComponent<LaserBoss>().BossEnableLasers();
     }

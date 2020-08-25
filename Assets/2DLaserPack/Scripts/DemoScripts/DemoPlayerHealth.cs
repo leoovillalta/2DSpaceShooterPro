@@ -116,7 +116,7 @@ namespace TwoDLaserPack
                 if (bloodParticleSystem != null)
                 {
                     bloodParticleSystem.Play();
-                    HealthPoints --;
+                    HealthPoints--;
                 }
             }
         }

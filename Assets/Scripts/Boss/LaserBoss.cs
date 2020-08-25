@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 using TwoDLaserPack;
 
 public class LaserBoss : MonoBehaviour
@@ -29,14 +30,43 @@ public class LaserBoss : MonoBehaviour
     private float _laserShootingTime = 3.0f;
     [SerializeField]
     private float _laserCoolDownTime = 3.0f;
+    
+    //Sounds
+    private AudioSource _audioLaser;
+    [SerializeField]
+    private AudioClip[] _audioClips;
+    //1 deploy
+    //2 shooting
+    //3 retreat
+    private bool _firstDeploy = false;
+    private bool _finishDeploy = false;
+
+
+    //Lasers shots
+
+    private LineBasedLaser[] allLasersInScene;
+
+    private GameObject _laserLid;
     // private LineBasedLaser _spriteRightLaserRef;
     // Start is called before the first frame update
     void Start()
     {
+        _laserLid = transform.Find("LaserLid").gameObject;
+        _laserLid.GetComponent<CircleCollider2D>().enabled = true;
+        transform.GetComponent<PolygonCollider2D>().enabled = false;
+        transform.GetComponent<PolygonCollider2D>().isTrigger = false;
+        _audioLaser = transform.GetComponent<AudioSource>();
         _boss = transform.parent.gameObject.GetComponent<Boss>();
         _player = GameObject.Find("Player");
         SetLaserPosition();
        // _spriteRightLaserRef = _rightLaser.transform.GetChild(1).transform.GetComponent<SpriteBasedLaser>();
+    }
+    void StopChangeClipPlay(int clip, bool loop)
+    {
+        _audioLaser.Stop();
+        _audioLaser.clip = _audioClips[clip];
+        _audioLaser.Play();
+        _audioLaser.loop = loop;
     }
     void SetLaserPosition()
     {
@@ -56,8 +86,15 @@ public class LaserBoss : MonoBehaviour
     {
         if (!_disabledLaser)
         {
-            if (!_shootingLaser)
+            if (_firstDeploy)
             {
+                _firstDeploy = false;
+                StopChangeClipPlay(0, false);
+                StartCoroutine(FinishedDeployTimer());
+            }
+            if (!_shootingLaser && _finishDeploy)
+            {
+               
                 _shootingLaser = true;
                 ShotRoutine();
             }
@@ -69,6 +106,13 @@ public class LaserBoss : MonoBehaviour
            
         }   
     }
+    IEnumerator FinishedDeployTimer()
+    {
+        yield return new WaitForSeconds(1.5f);
+        _finishDeploy = true;
+    }
+
+    
 
     void ShotRoutine()
     {
@@ -83,13 +127,17 @@ public class LaserBoss : MonoBehaviour
     }
     void ShotLaser()
     {
-        _laserCannon.gameObject.SetActive(true);
-        _laserCannon.laserActive = true;
+        StopChangeClipPlay(1, true);
+        // _laserCannon.gameObject.SetActive(true);
+        _laserLid.GetComponent<CircleCollider2D>().enabled = false;
+       // _laserCannon.laserActive = true;
     }
     void StopLaser()
     {
-        _laserCannon.gameObject.SetActive(false);
-        _laserCannon.laserActive = false;
+        _audioLaser.Stop();
+        //_laserCannon.gameObject.SetActive(false);
+        _laserLid.GetComponent<CircleCollider2D>().enabled = true;
+        //_laserCannon.laserActive = false;
     }
     void FollowPlayer()
     {
@@ -166,6 +214,7 @@ public class LaserBoss : MonoBehaviour
             //Disable Collider
             //Enable DamageChild
             //Disable Can be targeted
+            StopChangeClipPlay(2, false);
             ReportToBoss();
             DisableLaser();
         }
@@ -174,9 +223,19 @@ public class LaserBoss : MonoBehaviour
     void DisableLaser()
     {
         _disabledLaser = true;
+        _laserLid.GetComponent<CircleCollider2D>().enabled = true;
+       
         transform.gameObject.GetComponent<PolygonCollider2D>().enabled = false;
         transform.GetChild(2).gameObject.SetActive(true);
         _canBeTargeted = false;
+    }
+    void EnableLaser()
+    {
+        _disabledLaser = false;
+        _laserLid.GetComponent<CircleCollider2D>().enabled = true;
+        transform.gameObject.GetComponent<PolygonCollider2D>().enabled = true;
+        transform.GetChild(2).gameObject.SetActive(false);
+        _canBeTargeted = true;
     }
     void ReportToBoss()
     {
@@ -208,10 +267,18 @@ public class LaserBoss : MonoBehaviour
     public void BossEnableLasers()
     {
         _disabledLaser = false;
+        _firstDeploy = true;
+        transform.GetComponent<PolygonCollider2D>().isTrigger = true;
+        EnableLaser();
     }
     public void BossDisableLasers()
     {
         _disabledLaser = true;
+        transform.gameObject.GetComponent<PolygonCollider2D>().enabled = false;
+        transform.GetComponent<PolygonCollider2D>().isTrigger = false;
+        //transform.GetChild(2).gameObject.SetActive(true);
+        _canBeTargeted = false;
+        //DisableLaser();
     }
-
+    
 }
