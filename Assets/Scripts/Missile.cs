@@ -9,6 +9,7 @@ public class Missile : MonoBehaviour
     FiredBy firedBy = FiredBy.Player;
     [SerializeField]
     private float _missileSpeed = 6.0f;
+    [SerializeField]
     private GameObject _target;
     [SerializeField]
     private float _offsetAim = 0;
@@ -89,6 +90,10 @@ public class Missile : MonoBehaviour
 
     public void explosion()
     {
+        if(_player!= null)
+        {
+            _target.gameObject.GetComponent<Player>().NotLockedOn();
+        }
         GameObject newExplosion = Instantiate(_smallExplosionPrefab, transform.position, Quaternion.identity);
         Destroy(newExplosion, 2.5f);
     }
@@ -140,7 +145,7 @@ public class Missile : MonoBehaviour
         // move sprite towards the target location
         transform.position = Vector2.MoveTowards(transform.position, _targetV2pos, step);
     }
-    public void SearchAndLockOn()
+    void SearchAndLockOn()
     {
         switch (firedBy)
         {
@@ -151,44 +156,65 @@ public class Missile : MonoBehaviour
                 if (_player != null)
                 {
                     _target = _player.transform.gameObject;
-                }
-                
+                }                
                 break;
         }
         
         if(_target == null)
         {
             //Debug.Log("There are no enemies");
-            transform.GetChild(0).gameObject.SetActive(false);
+            transform.GetChild(0).gameObject.SetActive(false); //TurnsOffMissileFlame
         }
         else
         {
-            //_lockedOn = true;
-            if(_target.gameObject.GetComponent<Player>() != null)
+            switch (firedBy)
             {
-                _lockedOn = true;
-                _target.gameObject.GetComponent<Player>().LockedOn();
-                
-            }
-            else if(_target.gameObject.GetComponent<Enemy>() != null)
-            {
-                _lockedOn = true;
-                _target.gameObject.GetComponent<Enemy>().LockedOn();
-            }
-            else if(_target.gameObject.GetComponent<Turret>() != null)
-            {
-                if (_target.gameObject.GetComponent<Turret>().GetCanBeTargeted())
-                {
-                    _lockedOn = true;
-                    _target.gameObject.GetComponent<Turret>().LockedOn();
-                }
-                
-            }
-            
+                case FiredBy.Player:
+                    LockOnEnemy();
+                    break;
+                case FiredBy.Enemy:
+                    if (_target.gameObject.GetComponent<Player>() != null)
+                    {
+                        _lockedOn = true;
+                        _target.gameObject.GetComponent<Player>().LockedOn();
+                    }
+                    break;
+            }                   
         }
     }
-
-    public GameObject FindClosestEnemy()
+    void LockOnEnemy()
+    {
+        if (_target.gameObject.GetComponent<Enemy>() != null)
+        {
+            _lockedOn = true;
+            _target.gameObject.GetComponent<Enemy>().LockedOn();
+        }
+        else if (_target.gameObject.GetComponent<Turret>() != null)
+        {
+            if (_target.gameObject.GetComponent<Turret>().GetCanBeTargeted())
+            {
+                _lockedOn = true;
+                _target.gameObject.GetComponent<Turret>().LockedOn();
+            }
+        }
+        else if (_target.gameObject.GetComponent<LaserBoss>() != null)
+        {
+            if (_target.gameObject.GetComponent<LaserBoss>().GetCanBeTargeted())
+            {
+                _lockedOn = true;
+                _target.gameObject.GetComponent<LaserBoss>().LockedOn();
+            }
+        }
+        else if (_target.gameObject.GetComponent<Boss>() != null)
+        {
+            if (_target.gameObject.GetComponent<Boss>().GetCanBeTargeted())
+            {
+                _lockedOn = true;
+                _target.gameObject.GetComponent<Boss>().LockedOn();
+            }
+        }
+    }
+    private GameObject FindClosestEnemy()
     {
         GameObject[] gos;
         gos = GameObject.FindGameObjectsWithTag("Enemy");
@@ -199,7 +225,7 @@ public class Missile : MonoBehaviour
         {
             Vector3 diff = go.transform.position - position;
             float curDistance = diff.sqrMagnitude;
-            if (curDistance < distance)
+            if (curDistance < distance && go.GetComponent<MissileTargetingSystem>().GetCanBeTargeted())
             {
                 closest = go;
                 distance = curDistance;

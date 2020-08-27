@@ -48,6 +48,9 @@ public class LaserBoss : MonoBehaviour
 
     private GameObject _laserLid;
     // private LineBasedLaser _spriteRightLaserRef;
+
+    // For the Missiles
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -190,6 +193,7 @@ public class LaserBoss : MonoBehaviour
         if ((other.tag == "Laser" && (other.transform.GetComponent<Laser>().GetGameObjectType() == Laser.gameObjectType.Player))
             || (other.tag == "Missile" && other.transform.GetComponent<Missile>().GetFiredBy() == Missile.FiredBy.Player))
         {
+            _boss.HealthReport();
             if (other.tag == "Missile")
             {
                 transform.GetChild(1).gameObject.SetActive(false);
@@ -228,6 +232,7 @@ public class LaserBoss : MonoBehaviour
         transform.gameObject.GetComponent<PolygonCollider2D>().enabled = false;
         transform.GetChild(2).gameObject.SetActive(true);
         _canBeTargeted = false;
+        transform.GetComponent<MissileTargetingSystem>().SetCanBeTargeted(false);
     }
     void EnableLaser()
     {
@@ -236,6 +241,7 @@ public class LaserBoss : MonoBehaviour
         transform.gameObject.GetComponent<PolygonCollider2D>().enabled = true;
         transform.GetChild(2).gameObject.SetActive(false);
         _canBeTargeted = true;
+        transform.GetComponent<MissileTargetingSystem>().SetCanBeTargeted(true);
     }
     void ReportToBoss()
     {
@@ -278,7 +284,20 @@ public class LaserBoss : MonoBehaviour
         transform.GetComponent<PolygonCollider2D>().isTrigger = false;
         //transform.GetChild(2).gameObject.SetActive(true);
         _canBeTargeted = false;
+        transform.GetComponent<MissileTargetingSystem>().SetCanBeTargeted(false);
         //DisableLaser();
     }
-    
+    public bool GetCanBeTargeted()
+    {
+        return transform.GetComponent<MissileTargetingSystem>().GetCanBeTargeted();
+    }
+    public void LockedOn()
+    {
+        transform.GetChild(1).gameObject.SetActive(true);
+
+    }
+    public int GetHealth()
+    {
+        return _health;
+    }
 }

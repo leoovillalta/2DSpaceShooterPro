@@ -604,6 +604,10 @@ public class Player : MonoBehaviour
 
     }
 
+    public void NotLockedOn()
+    {
+        transform.GetChild(4).gameObject.SetActive(false);
 
+    }
 
 }

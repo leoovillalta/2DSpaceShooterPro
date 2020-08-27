@@ -62,6 +62,16 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Text _enemiesLeftCounter=default;
 
+
+    //BOSS HEALTH
+    [SerializeField]
+    private GameObject _bossHealthBar;
+    [SerializeField]
+    private Slider _bossHealthSlider;
+    [SerializeField]
+    private Text _bossPhaseText;
+
+
     private GameManager _gameManager;
     // Start is called before the first frame update
     void Start()
@@ -206,5 +216,17 @@ public class UIManager : MonoBehaviour
     public void EnemiesLeftUpdate(int EnemiesLeft)
     {
         _enemiesLeftCounter.text = "Enemies Left: " + EnemiesLeft;
+    }
+
+
+    //BOSS HEALTH AND PHASES
+    public void BossHealthUI(bool activated, float health)
+    {
+        _bossHealthBar.SetActive(activated);
+        _bossHealthSlider.value = health;
+    }
+    public void BossPhaseState(int phase)
+    {
+        _bossPhaseText.text = phase.ToString();
     }
 }

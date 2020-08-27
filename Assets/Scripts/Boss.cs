@@ -38,16 +38,38 @@ public class Boss : MonoBehaviour
 
     private bool _firstLaserDown = false;
 
+    //Total Health
+    private int _totalHealth;
+    private int _actualHealth;
+    private UIManager _uiManager;
+
     // Start is called before the first frame update
     void Start()
     {
+        _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+        _uiManager.BossHealthUI(true, 1f);
+        _uiManager.BossPhaseState(1);
         transform.GetComponent<BoxCollider2D>().enabled = false;
         _bossAnim = transform.GetComponent<Animator>();
         _conditionsForEndPhase = new bool[2];
         GetGamebjects();
         SetDisableAllWeapons();
-       
+        transform.GetComponent<MissileTargetingSystem>().SetCanBeTargeted(false);
+        //Method to calculate TotalHealth
+        _totalHealth = GetTotalHealth();
+        _actualHealth = _totalHealth;
         StartCoroutine(StartBossFightTimer());
+    }
+    int GetTotalHealth()
+    {
+        int Total=0;
+        Total = _rightTurret.GetComponent<Turret>().GetHealth() +
+                _leftTurret.GetComponent<Turret>().GetHealth() +
+                _rightLaser.GetComponent<LaserBoss>().GetHealth() +
+                _leftLaser.GetComponent<LaserBoss>().GetHealth() +
+                _centerTurret.GetComponent<Turret>().GetHealth() +
+                _health;
+        return Total;
     }
     void GetGamebjects()
     {
@@ -93,8 +115,9 @@ public class Boss : MonoBehaviour
         if(bossPhase==2 && _firstLaserDown)
         {
             //Send Activation for Central Cannon With Shields
-            _centerTurret.GetComponent<Turret>().BossEnableTurret();
+            _centerTurret.GetComponent<Turret>().SpecialCenterTurretActivation();
             _centerTurret.GetComponent<Turret>().Shields(true);
+            //_centerTurret.GetComponent<Turret>().EnableTurretCollider(false);
         }
     }
 
@@ -112,6 +135,7 @@ public class Boss : MonoBehaviour
                 //Turrets Can Be targeted
                 break;
             case 2:
+                _uiManager.BossPhaseState(2);
                 Array.Resize(ref _conditionsForEndPhase, 2);
                 Debug.Log("Entre a la segunda fase: ");
                 _bossAnim.SetTrigger("LaserStance");
@@ -122,6 +146,8 @@ public class Boss : MonoBehaviour
                 //Lasers Can be targeted
                 break;
             case 3:
+                _centerTurret.GetComponent<Turret>().EnableTurretCollider(true);
+                _uiManager.BossPhaseState(3);
                 _bossAnim.SetTrigger("HideLasers");
                 Array.Resize(ref _conditionsForEndPhase, 1);
                 _centerTurret.GetComponent<Turret>().Shields(false);
@@ -131,13 +157,17 @@ public class Boss : MonoBehaviour
                 //Central Cannon + Missiles
                 break;
             case 4:
+                _uiManager.BossPhaseState(4);
                 Array.Resize(ref _conditionsForEndPhase, 1);
                 _conditionsForEndPhase[0] = false;
                 //Central Cannon
                 break;
             case 5:
+                _uiManager.BossPhaseState(5);
                 Debug.Log("Final Phase, Destroy Main Ship");
                 transform.GetComponent<BoxCollider2D>().enabled = true;
+
+                transform.GetComponent<MissileTargetingSystem>().SetCanBeTargeted(true);
                 //Destroy big ship
                 //Maybe Restore all fire power in one last stand
                 break;
@@ -176,6 +206,7 @@ public class Boss : MonoBehaviour
         if ((other.tag == "Laser" && (other.transform.GetComponent<Laser>().GetGameObjectType() == Laser.gameObjectType.Player))
            || (other.tag == "Missile" && other.transform.GetComponent<Missile>().GetFiredBy() == Missile.FiredBy.Player))
         {
+            HealthReport();
             if (other.tag == "Missile")
             {
                 transform.GetChild(0).gameObject.SetActive(false);
@@ -209,6 +240,7 @@ public class Boss : MonoBehaviour
         if (_health <= 0)
         {
             //DestroyedAnimation
+            _uiManager.BossHealthUI(false, 0);
             Destroy(this.gameObject);
         }
 
@@ -224,9 +256,27 @@ public class Boss : MonoBehaviour
         }
 
     }
-
+    public void LockedOn()
+    {
+        transform.GetChild(0).gameObject.SetActive(true);
+    }
     public void ReportFirstLaserDown()
     {
         _firstLaserDown = true;
+    }
+
+    public bool GetCanBeTargeted()
+    {
+        return transform.GetComponent<MissileTargetingSystem>().GetCanBeTargeted();
+    }
+    public void HealthReport()
+    {
+        _actualHealth--;
+        UpdateBossHealthUI();
+    }
+    void UpdateBossHealthUI()
+    {
+        float newBossHealth = (float)_actualHealth / _totalHealth;
+        _uiManager.BossHealthUI(true, newBossHealth);
     }
 }

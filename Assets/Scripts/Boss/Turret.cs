@@ -225,11 +225,16 @@ public class Turret : MonoBehaviour
         if((other.tag=="Laser"&& (other.transform.GetComponent<Laser>().GetGameObjectType() == Laser.gameObjectType.Player))
             || (other.tag =="Missile" && other.transform.GetComponent<Missile>().GetFiredBy() == Missile.FiredBy.Player))
         {
+            _boss.HealthReport();
             if(other.tag == "Missile")
             {
                 transform.GetChild(1).gameObject.SetActive(false);
                 //explosion
                 GameObject newExplosion = Instantiate(_smallExplosionPrefab, transform.position, Quaternion.identity, this.transform);
+                if(_turretPosition == TurretPosition.Center)
+                {
+                    newExplosion.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
+                }
                 Destroy(newExplosion, 2.5f);
             }
             //Debug.Log("The Player has hit me");
@@ -296,6 +301,7 @@ public class Turret : MonoBehaviour
         transform.gameObject.GetComponent<BoxCollider2D>().enabled = false;
         transform.GetChild(0).gameObject.SetActive(true);
         _CanBeTargeted = false;
+        transform.GetComponent<MissileTargetingSystem>().SetCanBeTargeted(false);
     }
 
     IEnumerator PaintDamage()
@@ -333,6 +339,8 @@ public class Turret : MonoBehaviour
     {
         transform.GetComponent<BoxCollider2D>().enabled = true;
         _disabledTurret = false;
+        _CanBeTargeted = true;
+        transform.GetComponent<MissileTargetingSystem>().SetCanBeTargeted(true);
     }
     public void BossDisableTurret()
     {
@@ -350,6 +358,21 @@ public class Turret : MonoBehaviour
     }
     public bool GetCanBeTargeted()
     {
-        return _CanBeTargeted;
+        return transform.GetComponent<MissileTargetingSystem>().GetCanBeTargeted();
+    }
+    public int GetHealth()
+    {
+        return _health;
+    }
+    public void EnableTurretCollider(bool activate)
+    {
+        transform.GetComponent<BoxCollider2D>().enabled = activate;
+    }
+    public void SpecialCenterTurretActivation()
+    {
+        transform.GetComponent<BoxCollider2D>().enabled = false;
+        _disabledTurret = false;
+        _CanBeTargeted = true;
+        transform.GetComponent<MissileTargetingSystem>().SetCanBeTargeted(true);
     }
 }
