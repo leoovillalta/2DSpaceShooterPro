@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class Boss : MonoBehaviour
+public class Boss : MonoBehaviour,IMissileTargetable
 {
     //VARIABLES
     //health, anim, speed rotation for cannons, speed for lasers to follow
@@ -43,6 +43,7 @@ public class Boss : MonoBehaviour
     private int _actualHealth;
     private UIManager _uiManager;
 
+    private bool _canBetargeted = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -55,6 +56,7 @@ public class Boss : MonoBehaviour
         GetGamebjects();
         SetDisableAllWeapons();
         transform.GetComponent<MissileTargetingSystem>().SetCanBeTargeted(false);
+        _canBetargeted = false; 
         //Method to calculate TotalHealth
         _totalHealth = GetTotalHealth();
         _actualHealth = _totalHealth;
@@ -167,6 +169,7 @@ public class Boss : MonoBehaviour
                 Debug.Log("Final Phase, Destroy Main Ship");
                 transform.GetComponent<BoxCollider2D>().enabled = true;
 
+                _canBetargeted = true;
                 transform.GetComponent<MissileTargetingSystem>().SetCanBeTargeted(true);
                 //Destroy big ship
                 //Maybe Restore all fire power in one last stand
@@ -269,6 +272,10 @@ public class Boss : MonoBehaviour
     {
         return transform.GetComponent<MissileTargetingSystem>().GetCanBeTargeted();
     }
+    public bool CanBeTargeted()
+    {
+        return _canBetargeted;
+    }
     public void HealthReport()
     {
         _actualHealth--;
@@ -277,6 +284,10 @@ public class Boss : MonoBehaviour
     void UpdateBossHealthUI()
     {
         float newBossHealth = (float)_actualHealth / _totalHealth;
-        _uiManager.BossHealthUI(true, newBossHealth);
+        if (_uiManager != null)
+        {
+            _uiManager.BossHealthUI(true, newBossHealth);
+        }
+        
     }
 }

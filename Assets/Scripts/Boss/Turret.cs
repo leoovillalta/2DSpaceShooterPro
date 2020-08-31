@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Turret : MonoBehaviour
+public class Turret : MonoBehaviour,IMissileTargetable
 {
+    #region Variables
     public enum TurretPosition {Right, Left, Center };
     [SerializeField]
     private int _health=5;
@@ -79,7 +80,8 @@ public class Turret : MonoBehaviour
     //0 aiming
     //1 Shooting
     //2 Cooldown
-
+    #endregion
+    #region StartSetAndUpdate
     // Start is called before the first frame update
     void Start()
     {
@@ -141,7 +143,8 @@ public class Turret : MonoBehaviour
             
         }
     }
-      
+    #endregion
+    #region AimingAndFiring
     void lockOnPlayer()
     {
         //needs validation if player is still alive
@@ -219,7 +222,8 @@ public class Turret : MonoBehaviour
         _turretCoolDown = false;
         _startTurretCoolDown = false;
     }
-
+    #endregion
+    #region Collider
     private void OnTriggerEnter2D(Collider2D other)
     {
         if((other.tag=="Laser"&& (other.transform.GetComponent<Laser>().GetGameObjectType() == Laser.gameObjectType.Player))
@@ -252,6 +256,19 @@ public class Turret : MonoBehaviour
             StartCoroutine(PaintDamage());
         }
     }
+    IEnumerator PaintDamage()
+    {
+        for (int i = 0; i <= 2; i++)
+        {
+            transform.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+            yield return new WaitForSeconds(0.1f);
+            transform.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+            yield return new WaitForSeconds(0.1f);
+        }
+
+    }
+    #endregion
+    #region HealthStatusAndReport
     void healthStatus()
     {
         //Report to Boss
@@ -282,6 +299,8 @@ public class Turret : MonoBehaviour
         }
         
     }
+    #endregion
+    #region EnableAndDisableElements
     void disableTurret()
     {
         _disabledTurret = true;
@@ -304,17 +323,7 @@ public class Turret : MonoBehaviour
         transform.GetComponent<MissileTargetingSystem>().SetCanBeTargeted(false);
     }
 
-    IEnumerator PaintDamage()
-    {
-        for(int i = 0; i <= 2; i++)
-        {
-            transform.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
-            yield return new WaitForSeconds(0.1f);
-            transform.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
-            yield return new WaitForSeconds(0.1f);
-        }
-        
-    }
+    
     void TurnOnShields()
     {
         transform.GetChild(2).gameObject.SetActive(true);
@@ -323,6 +332,8 @@ public class Turret : MonoBehaviour
     {
         transform.GetChild(2).gameObject.SetActive(false);
     }
+    #endregion
+    #region PublicMethods
     public void Shields(bool status)
     {
         _shieldsOn = status;
@@ -347,11 +358,7 @@ public class Turret : MonoBehaviour
         _disabledTurret = true;
         transform.GetComponent<BoxCollider2D>().enabled = false;
     }
-    public void LockedOn()
-    {
-        transform.GetChild(1).gameObject.SetActive(true);
-        
-    }
+    
     public TurretPosition GetTurretPosition()
     {
         return _turretPosition;
@@ -360,6 +367,8 @@ public class Turret : MonoBehaviour
     {
         return transform.GetComponent<MissileTargetingSystem>().GetCanBeTargeted();
     }
+    
+
     public int GetHealth()
     {
         return _health;
@@ -375,4 +384,16 @@ public class Turret : MonoBehaviour
         _CanBeTargeted = true;
         transform.GetComponent<MissileTargetingSystem>().SetCanBeTargeted(true);
     }
+    #endregion
+    #region IMissileTargetableMethods
+    //Interface Methods
+    public bool CanBeTargeted()
+    {
+        return _CanBeTargeted;
+    }
+    public void LockedOn()
+    {
+        transform.GetChild(1).gameObject.SetActive(true);
+    }
+    #endregion
 }

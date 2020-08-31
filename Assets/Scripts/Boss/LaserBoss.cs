@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Linq;
 using TwoDLaserPack;
 
-public class LaserBoss : MonoBehaviour
+public class LaserBoss : MonoBehaviour,IMissileTargetable
 {
     public enum LaserPosition { Left,Right};
     [SerializeField]private LaserPosition _laserPosition = LaserPosition.Right;
@@ -299,5 +299,9 @@ public class LaserBoss : MonoBehaviour
     public int GetHealth()
     {
         return _health;
+    }
+    public bool CanBeTargeted()
+    {
+        return _canBeTargeted;
     }
 }

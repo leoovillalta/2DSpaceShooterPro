@@ -170,7 +170,7 @@ public class Missile : MonoBehaviour
             switch (firedBy)
             {
                 case FiredBy.Player:
-                    LockOnEnemy();
+                    LockOnEnemyV2();
                     break;
                 case FiredBy.Enemy:
                     if (_target.gameObject.GetComponent<Player>() != null)
@@ -180,6 +180,15 @@ public class Missile : MonoBehaviour
                     }
                     break;
             }                   
+        }
+    }
+    void LockOnEnemyV2()
+    {
+        IMissileTargetable targetable = _target.gameObject.GetComponent<IMissileTargetable>();
+        if (targetable.CanBeTargeted())
+        {
+            _lockedOn = true;
+            targetable.LockedOn();
         }
     }
     void LockOnEnemy()

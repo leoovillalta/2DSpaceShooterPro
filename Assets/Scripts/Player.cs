@@ -119,7 +119,11 @@ public class Player : MonoBehaviour
     {
 
         //Transform to position 0,0,0
-        _missileSpawner = GameObject.Find("MissileSpawner").GetComponent<MissileSpawner>();
+        if(GameObject.Find("MissileSpawner") != null)
+        {
+            _missileSpawner = GameObject.Find("MissileSpawner").GetComponent<MissileSpawner>();
+        }
+        
         _anim = transform.GetComponent<Animator>();
         transform.position = new Vector3(0, -2, 0);
         _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
@@ -532,7 +536,16 @@ public class Player : MonoBehaviour
         {
             case 0:
                 _spawnManager.OnPlayerDeath();
-                _missileSpawner.OnPlayerDeath();
+                if (_missileSpawner == null)
+                {
+                    _missileSpawner = GameObject.Find("MissileSpawner").GetComponent<MissileSpawner>();
+                    _missileSpawner.OnPlayerDeath();
+                }
+                else
+                {
+                    _missileSpawner.OnPlayerDeath();
+                }
+                
                 foreach (var lineBasedLaser in allLasersInScene)
                 {
                     lineBasedLaser.OnLaserHitTriggered -= LaserOnOnLaserHitTriggered;

@@ -65,8 +65,12 @@ public class SpawnManager : MonoBehaviour
     #region StartAndUpdate
     private void Start()
     {
-        
-        _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+
+        if (GameObject.Find("Canvas") != null)
+        {
+            _uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+        }
+       
         _actualWave = 1;
         _waveCompleted = false;
         _enemiesSpawned = 0;

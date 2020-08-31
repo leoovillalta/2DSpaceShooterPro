@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour,IMissileTargetable
 {
     #region Variables
     enum Aggresivity { Normal,Aggresive, Smart, SmartFront, SuperSmart};
@@ -607,4 +607,10 @@ public class Enemy : MonoBehaviour
         _laserShotIncoming = true;
     }
     #endregion
+
+    //Interface Method
+    public bool CanBeTargeted()
+    {
+        return true;
+    }
 }
