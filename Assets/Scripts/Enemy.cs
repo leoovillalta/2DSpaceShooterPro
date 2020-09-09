@@ -108,6 +108,7 @@ public class Enemy : MonoBehaviour,IMissileTargetable
     private bool _chooseDodgeDirection = false;
     private int _randomDodgeDirection;
     private bool _reportOnce = true;
+    private bool _enemyDead = false;
     #endregion
 
     #region StartAndUpdate
@@ -254,21 +255,25 @@ public class Enemy : MonoBehaviour,IMissileTargetable
     }
     void EnemyAttackType()
     {
-        switch (_enemyAttack)
+        if (!_enemyDead)
         {
-            case EnemyAttack.Laser:
-                LaserAttack();
-                break;
-            case EnemyAttack.Mine:
-                MineDeploy();
-                break;
-            case EnemyAttack.Ram:
-                RamAttack();
-                break;
-            case EnemyAttack.None:
-                //Do nothing
-                break;
+            switch (_enemyAttack)
+            {
+                case EnemyAttack.Laser:
+                    LaserAttack();
+                    break;
+                case EnemyAttack.Mine:
+                    MineDeploy();
+                    break;
+                case EnemyAttack.Ram:
+                    RamAttack();
+                    break;
+                case EnemyAttack.None:
+                    //Do nothing
+                    break;
+            }
         }
+        
     }
     void SuperSmartSet()
     {
@@ -534,12 +539,18 @@ public class Enemy : MonoBehaviour,IMissileTargetable
             }
             //1era version menos optimizada
             //other.transform.GetComponent<Player>().Damage();
+            _enemyDead = true;
             _anim.SetTrigger("OnEnemyDeath");
             _speed = 0; //para detener el objeto
             _audioSource.Play();
             _dead = true;
             Destroy(GetComponent<Collider2D>(),0.5f);
-            _spawnManager.EnemyDestroyedReport();
+            if (_reportOnce)
+            {
+                _reportOnce = false;
+                _spawnManager.EnemyDestroyedReport();
+            }
+            //_spawnManager.EnemyDestroyedReport();
             Destroy(this.gameObject,2.6f);
             
         }
@@ -568,6 +579,7 @@ public class Enemy : MonoBehaviour,IMissileTargetable
 
                     _player.AddScore(10);
                 }
+                _enemyDead = true;
                 Destroy(GetComponent<Collider2D>(), 0.5f);
                 _anim.SetTrigger("OnEnemyDeath");
                 _speed = 0;
@@ -581,7 +593,7 @@ public class Enemy : MonoBehaviour,IMissileTargetable
                     _reportOnce = false;
                     _spawnManager.EnemyDestroyedReport();
                 }
-               
+
 
                 Destroy(this.gameObject, 2.6f);
             }
