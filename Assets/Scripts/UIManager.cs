@@ -71,7 +71,9 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private Text _bossPhaseText;
 
-
+    [SerializeField]
+    private Text _finalScore;
+    private int _score;
     private GameManager _gameManager;
     // Start is called before the first frame update
     void Start()
@@ -98,6 +100,7 @@ public class UIManager : MonoBehaviour
 
     public void UpdateScore(int playerScore)
     {
+        _score = playerScore;
         _ScoreText.text = "Score: " + playerScore.ToString();
     }
 
@@ -107,6 +110,12 @@ public class UIManager : MonoBehaviour
         if (currentLives == 0) {
             GameOverSequence();
         }
+    }
+
+    public void MissionAccomplished()
+    {
+        _gameManager.GameOver();
+        _finalScore.text = "Final Score: " + _score; 
     }
 
     void GameOverSequence()

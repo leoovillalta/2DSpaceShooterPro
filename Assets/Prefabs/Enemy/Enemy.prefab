@@ -80,6 +80,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -227,6 +228,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -331,6 +333,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -482,6 +485,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -628,7 +632,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1422542281
 Transform:
   m_ObjectHideFlags: 0
@@ -725,6 +729,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -913,7 +918,7 @@ MonoBehaviour:
   _enemyMovement: 0
   _enemyAttack: 0
   _enemyDefense: 0
-  _aggresivity: 1
+  _aggresivity: 0
   _enemySprites:
   - {fileID: 21300000, guid: 3154912113cbb4a498df6f571c74e18c, type: 3}
   - {fileID: 21300004, guid: 76ae66d8633c3ad40bb908b654d63da1, type: 3}
@@ -926,6 +931,9 @@ MonoBehaviour:
   _offsetAim: 90
   _laserUp: {fileID: 5471559746161180762, guid: ed551155b11ed4244835140549730bba,
     type: 3}
+  _dodgesLeft: 2
+  _dodgeSpeed: 4
+  _dodgeDuration: 1
 --- !u!50 &9081571099156558526
 Rigidbody2D:
   serializedVersion: 4
@@ -962,6 +970,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:

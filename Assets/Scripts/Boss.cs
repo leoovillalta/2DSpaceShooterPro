@@ -44,6 +44,9 @@ public class Boss : MonoBehaviour,IMissileTargetable
     private UIManager _uiManager;
 
     private bool _canBetargeted = false;
+
+    [SerializeField]
+    private GameObject _BossDefeatedCutscene;
     // Start is called before the first frame update
     void Start()
     {
@@ -243,8 +246,10 @@ public class Boss : MonoBehaviour,IMissileTargetable
         if (_health <= 0)
         {
             //DestroyedAnimation
+            _uiManager.MissionAccomplished();
             _uiManager.BossHealthUI(false, 0);
-            Destroy(this.gameObject);
+            _BossDefeatedCutscene.SetActive(true);
+            Destroy(this.gameObject,0.1f);
         }
 
     }

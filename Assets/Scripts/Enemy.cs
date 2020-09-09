@@ -107,6 +107,7 @@ public class Enemy : MonoBehaviour,IMissileTargetable
     private float _dodgeDuration = 1f;
     private bool _chooseDodgeDirection = false;
     private int _randomDodgeDirection;
+    private bool _reportOnce = true;
     #endregion
 
     #region StartAndUpdate
@@ -114,7 +115,11 @@ public class Enemy : MonoBehaviour,IMissileTargetable
     {
         //SetEnemyType();
         _spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
-        _player = GameObject.Find("Player").GetComponent<Player>();
+        if (GameObject.Find("Player") != null)
+        {
+            _player = GameObject.Find("Player").GetComponent<Player>();
+        }
+       
         _audioSource = GetComponent<AudioSource>();
         
         if(_player == null)
@@ -521,8 +526,7 @@ public class Enemy : MonoBehaviour,IMissileTargetable
         {
             //Damage Player
             //Version optimizada para evitar errores
-            transform.GetChild(1).gameObject.SetActive(false);
-            transform.GetChild(2).gameObject.SetActive(false);
+            DisableEnemySystems();
             Player player = other.transform.GetComponent<Player>();
             if(player != null)
             {
@@ -543,7 +547,8 @@ public class Enemy : MonoBehaviour,IMissileTargetable
         /// if hit by a laser or missile resist one hit and remove the shield
         
             //receive full blow
-            if (other.tag == "Laser" || other.tag == "Missile")
+            if ((other.tag == "Laser" && (other.transform.GetComponent<Laser>().GetGameObjectType() == Laser.gameObjectType.Player)) 
+            || (other.tag == "Missile" && (other.transform.GetComponent<Missile>().GetFiredBy()==Missile.FiredBy.Player)))
             {
             if (_shieldActive)
             {
@@ -557,20 +562,27 @@ public class Enemy : MonoBehaviour,IMissileTargetable
             }
             else
             {
-               
+                DisableEnemySystems();
                 if (_player != null)
                 {
 
                     _player.AddScore(10);
                 }
+                Destroy(GetComponent<Collider2D>(), 0.5f);
                 _anim.SetTrigger("OnEnemyDeath");
                 _speed = 0;
                 _audioSource.Play();
                 _dead = true;
                 transform.GetChild(2).gameObject.SetActive(false);
-                Destroy(GetComponent<Collider2D>(),0.5f);
+                
                 transform.GetChild(0).gameObject.SetActive(false);
-                _spawnManager.EnemyDestroyedReport();
+                if (_reportOnce)
+                {
+                    _reportOnce = false;
+                    _spawnManager.EnemyDestroyedReport();
+                }
+               
+
                 Destroy(this.gameObject, 2.6f);
             }
 
@@ -578,6 +590,14 @@ public class Enemy : MonoBehaviour,IMissileTargetable
 
 
 
+    }
+    void DisableEnemySystems()
+    {
+        transform.GetChild(1).gameObject.SetActive(false);
+        transform.GetChild(2).gameObject.SetActive(false);
+        transform.GetChild(3).gameObject.SetActive(false);
+        transform.GetChild(4).gameObject.SetActive(false);
+        transform.GetChild(0).gameObject.SetActive(false);
     }
     #region publicMethods
     public void LockedOn()

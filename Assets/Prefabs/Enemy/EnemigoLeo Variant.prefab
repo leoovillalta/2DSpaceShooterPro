@@ -15,17 +15,22 @@ PrefabInstance:
     - target: {fileID: -8790241142499210537, guid: a60838d63d369494c9ea03531e4313c6,
         type: 3}
       propertyPath: _enemyMovement
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8790241142499210537, guid: a60838d63d369494c9ea03531e4313c6,
         type: 3}
       propertyPath: _enemyAttack
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: -8790241142499210537, guid: a60838d63d369494c9ea03531e4313c6,
         type: 3}
       propertyPath: _enemyDefense
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8790241142499210537, guid: a60838d63d369494c9ea03531e4313c6,
+        type: 3}
+      propertyPath: _aggresivity
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 962009173821354668, guid: a60838d63d369494c9ea03531e4313c6,
         type: 3}

@@ -112,6 +112,7 @@ public class Player : MonoBehaviour
 
     //LASERS STOP FIRING AFTER DEATH
     //Stop missiles after death
+    [SerializeField]
     private MissileSpawner _missileSpawner;
 
     // Start is called before the first frame update
@@ -119,10 +120,7 @@ public class Player : MonoBehaviour
     {
 
         //Transform to position 0,0,0
-        if(GameObject.Find("MissileSpawner") != null)
-        {
-            _missileSpawner = GameObject.Find("MissileSpawner").GetComponent<MissileSpawner>();
-        }
+        
         
         _anim = transform.GetComponent<Animator>();
         transform.position = new Vector3(0, -2, 0);
@@ -131,6 +129,7 @@ public class Player : MonoBehaviour
         _audioSource = GetComponent<AudioSource>();
         _thruster = GameObject.Find("Thruster").GetComponent<ThrusterBehaviour>();
         _cameraShake = GameObject.Find("Main Camera").GetComponent<CameraShake>();
+         
 
         //thrusters
         _initialSpeed = _speed;
@@ -140,7 +139,7 @@ public class Player : MonoBehaviour
         _initialLives = _lives;
 
         //BOSS LASERS
-        LasersToBeShot();
+        StartCoroutine(waitForBossToSpawn());
 
 
         if(_spawnManager == null)
@@ -159,7 +158,15 @@ public class Player : MonoBehaviour
             _audioSource.clip = _laserSoundClip;
         }
     }
-
+    IEnumerator waitForBossToSpawn()
+    {
+        yield return new WaitForSeconds(1f);
+        LasersToBeShot();
+        if (GameObject.Find("MissileSpawner") != null)
+        {
+            _missileSpawner = GameObject.Find("MissileSpawner").GetComponent<MissileSpawner>();
+        }
+    }
     void ThrusterUp()
     {
         
@@ -536,22 +543,19 @@ public class Player : MonoBehaviour
         {
             case 0:
                 _spawnManager.OnPlayerDeath();
-                if (_missileSpawner == null)
+                if (GameObject.Find("MissileSpawner") != null)
                 {
                     _missileSpawner = GameObject.Find("MissileSpawner").GetComponent<MissileSpawner>();
                     _missileSpawner.OnPlayerDeath();
                 }
-                else
-                {
-                    _missileSpawner.OnPlayerDeath();
-                }
+                
                 
                 foreach (var lineBasedLaser in allLasersInScene)
                 {
                     lineBasedLaser.OnLaserHitTriggered -= LaserOnOnLaserHitTriggered;
                     //lineBasedLaser.SetLaserState(false);
                 }
-                Destroy(this.gameObject,0.1f);
+                Destroy(this.gameObject,0);
                 break;
             case 1:
                 _rightEngine.SetActive(true);

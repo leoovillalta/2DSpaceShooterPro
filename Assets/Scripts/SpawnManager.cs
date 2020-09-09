@@ -17,12 +17,17 @@ public class SpawnManager : MonoBehaviour
     //WAVE SYSTEM
     [SerializeField]
     private Wave[] _waves;
+    [SerializeField]
     private int _enemiesSpawned;
+
     private int _enemiesLeft;
+    [SerializeField]
     private int _enemiesDestroyed;
+    [SerializeField]
     private int _actualWave;
     //Wave Elements
     private string _waveTitle;
+    [SerializeField]
     private int _amountOfEnemiesInWave;
     [SerializeField]
     private float _difficultyFactor = 1;//to be set later
@@ -59,8 +64,18 @@ public class SpawnManager : MonoBehaviour
     [SerializeField]
     private float[] _enemyCumulativeProbability;
 
+    private bool _waveEnded = false;
 
     private bool _stopSpawning = false;
+    [SerializeField]
+    private bool _waveSpawnCompleted = false;
+
+    //BOSS
+    private bool _BossFight = false;
+    [SerializeField]
+    private GameObject IntroBossCutscene;
+    private bool _pausePowerUps = false;
+    private bool _bossFightStarted = false;
     #endregion
     #region StartAndUpdate
     private void Start()
@@ -103,6 +118,7 @@ public class SpawnManager : MonoBehaviour
     
     public void StartSpawning()
     {
+        //The very beginning once The Asteroid is destroyed
         WaveManager();   
         StartCoroutine(SpawnPowerUpRoutine());
     }
@@ -117,15 +133,33 @@ public class SpawnManager : MonoBehaviour
             _actualWave++;
            // Debug.Log("New Actual Wave: " + _actualWave);
             //Debug.Log("Voy a llamar otra vez al Wave Manager");
-            WaveManager();
-            //StartCoroutine(WaitForNewWave());
+            //WaveManager();
+            StartCoroutine(WaitForNewWave());
         }
         //Check if all the enemies have been spawned and if there are no enemies left in the field
-        if (_enemiesSpawned == _amountOfEnemiesInWave && (_enemiesLeft <= 0))
+        if (_waveSpawnCompleted && (_enemiesLeft <= 0) && _waveEnded)
         {
+            _waveEnded = false;
             //Debug.Log("Termine la Oleada");
             _waveCompleted = true;
         }
+        if(_enemiesSpawned == (_amountOfEnemiesInWave ))
+        {
+            _waveSpawnCompleted = true;
+        }
+        if (_BossFight && !_bossFightStarted)
+        {
+            _bossFightStarted = true;
+            StartCoroutine(BossFightTimer());
+            _pausePowerUps = true;
+        }
+    }
+    IEnumerator BossFightTimer()
+    {
+        yield return new WaitForSeconds(3.0f);
+        IntroBossCutscene.gameObject.SetActive(true);
+        yield return new WaitForSeconds(45f);
+        _pausePowerUps = false;
     }
     #endregion
     #region EnemyWaveManager
@@ -141,6 +175,7 @@ public class SpawnManager : MonoBehaviour
                 _amountOfEnemiesInWave = WaveSelected.AmountOfEnemiesToBeSpawned;
                 //_difficulty = WaveSelected.Difficulty;//To be implemented later
                 _isThereABossInTheWave = WaveSelected.IsThereABoss;
+                _BossFight = _isThereABossInTheWave;
                 _uiManager.ActivateAndAnnounceWave(_waveTitle, WaveSelected.WaveNumber, _amountOfEnemiesInWave);
                 _enemiesLeft = _amountOfEnemiesInWave - _enemiesDestroyed;
                 _uiManager.EnemiesLeftUpdate(_enemiesLeft);
@@ -164,14 +199,15 @@ public class SpawnManager : MonoBehaviour
     {
         //yield return null;//espera 1 segundo
         //Instantiate Enemies prefabs
-        
+        _waveSpawnCompleted = false;
         //Debug.Log("EstamosEsperando 5 segundos");
         yield return new WaitForSeconds(5.0f);
-        while ((_stopSpawning == false) || (_waveCompleted == false))
+        _waveEnded = true;
+        while ((_stopSpawning == false) && (_waveCompleted == false))
         {
            
             //Debug.Log("Entramos al while infinito hasta terminar la oleada o morir");
-            if ((_enemiesSpawned <= _amountOfEnemiesInWave - 1) && (_stopSpawning==false))
+            if ((!_waveSpawnCompleted) && (_stopSpawning==false))
             {
                // Debug.Log("Estoy creando al enemigo: " + (_enemiesSpawned + 1));
                 Vector3 posToSpawn = new Vector3(Random.Range(-8.0f, 8.0f), 7, 0);
@@ -421,9 +457,18 @@ public class SpawnManager : MonoBehaviour
         yield return new WaitForSeconds(3.0f);
         while (_stopSpawning == false)
         {
-            Vector3 postToSpawn = new Vector3(Random.Range(-8f, 8f), 7, 0);
-            Instantiate(GetRandomPowerUp(), postToSpawn, Quaternion.identity);
-            yield return new WaitForSeconds(Random.Range(3, 8));
+            if (_pausePowerUps)
+            {
+                yield return null;
+            }
+            else
+            {
+                Vector3 postToSpawn = new Vector3(Random.Range(-8f, 8f), 7, 0);
+                Instantiate(GetRandomPowerUp(), postToSpawn, Quaternion.identity);
+                yield return new WaitForSeconds(Random.Range(3, 8));
+            }
+            
+
         }
     }
     GameObject GetRandomPowerUp()
@@ -444,7 +489,7 @@ public class SpawnManager : MonoBehaviour
 
     public void OnPlayerDeath()
     {
-        //Debug.Log("PlayerDead");
+        Debug.Log("PlayerDead");
         _stopSpawning = true;
     }
 

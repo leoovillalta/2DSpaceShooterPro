@@ -234,7 +234,7 @@ public class Missile : MonoBehaviour
         {
             Vector3 diff = go.transform.position - position;
             float curDistance = diff.sqrMagnitude;
-            if (curDistance < distance && go.GetComponent<MissileTargetingSystem>().GetCanBeTargeted())
+            if (curDistance < distance && go.GetComponent<IMissileTargetable>().CanBeTargeted())
             {
                 closest = go;
                 distance = curDistance;
@@ -255,6 +255,11 @@ public class Missile : MonoBehaviour
                 Destroy(this.gameObject, 2.5f);
             }
 
+        }
+        if(other.tag =="Enemy" && firedBy == FiredBy.Player)
+        {
+            
+            Destroy(this.gameObject, 0.1f);
         }
     }
 

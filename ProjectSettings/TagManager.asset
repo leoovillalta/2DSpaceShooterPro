@@ -19,7 +19,7 @@ TagManager:
   - 
   - 
   - Post Processing
-  - 
+  - TEXT
   - 
   - 
   - 
@@ -51,4 +51,10 @@ TagManager:
     locked: 0
   - name: Foreground
     uniqueID: 2589186929
+    locked: 0
+  - name: ExplosionsTop
+    uniqueID: 2951883555
+    locked: 0
+  - name: UI
+    uniqueID: 3470450407
     locked: 0
